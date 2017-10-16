@@ -1,12 +1,8 @@
 # LINE Python
 
-.. image:: https://img.shields.io/badge/license-BSD-blue.svg
-    :target: LICENSE
-    :alt: License: BSD
+[![LICENSE](https://img.shields.io/badge/license-BSD-blue.svg "LICENSE")](https://github.com/fadhiilrachman/line-py/blob/master/LICENSE)
 
-.. image:: https://img.shields.io/badge/python-2.7%2C%203.x-blue.svg
-    :target: https://pypi.python.org/pypi/linepy
-    :alt: Supported python versions: 2.7, 3.x
+[![Supported python versions: 2.7, 3.x](https://img.shields.io/badge/python-2.7%2C%203.x-blue.svg "Supported python versions: 2.7, 3.x")](https://pypi.python.org/pypi/linepy)
 
 *LINE Messaging's private API*
 
