@@ -16,12 +16,18 @@ def RECEIVE_MESSAGE(op):
     msg_id = msg.id
     receiver = msg.to
     sender = msg._from
-
+    
+    # Check content only text message
     if msg.contentType == 0:
-        contact = client.getContact(receiver)
-        txt = '[%s] %s' % (contact.displayName, text)
-        client.sendMessage(receiver, txt)
-        client.log(txt)
+        # Check only group chat
+        if msg.toType == 2:
+            # Get sender contact
+            contact = client.getContact(sender)
+            txt = '[%s] %s' % (contact.displayName, text)
+            # Send a message
+            client.sendMessage(receiver, txt)
+            # Print log
+            client.log(txt)
 
 # Add function to LinePoll
 poll.addOpInterruptWithDict({
