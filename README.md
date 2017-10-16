@@ -8,15 +8,25 @@
 
 ### Installation
 
+Python 2.7 :
 ```sh
 $ pip install linepy
+```
+Python 3.x :
+```sh
+$ pip3 install linepy
 ```
 - **Requires:** [Python 3.x](https://www.python.org/downloads/) (Works with Python 2.x, but i can't recommend)
 
 ### Updating
 
+Python 2.7 :
 ```sh
 $ pip install linepy --upgrade
+```
+Python 3.x :
+```sh
+$ pip3 install linepy --upgrade
 ```
 
 ### Special thanks
