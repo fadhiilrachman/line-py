@@ -11,7 +11,7 @@ $ pip install linepy
 ```
 - **Requires:** [Python 3.x](https://www.python.org/downloads/) (Works with Python 2.x, but i can't recommend)
 
-### Update
+### Updating
 
 ```sh
 $ pip install linepy --upgrade
