@@ -1,6 +1,6 @@
 # ![logo](/examples/assets/LINE-sm.png) LINE Python
 
- [![Version 1.5](https://img.shields.io/badge/stable-1.5-brightgreen.svg "Version 1.5")](https://pypi.python.org/pypi/linepy) [![LICENSE](https://img.shields.io/badge/license-BSD-blue.svg "LICENSE")](https://github.com/fadhiilrachman/line-py/blob/master/LICENSE) [![Supported python versions: 2.7, 3.x](https://img.shields.io/badge/python-2.7%2C%203.x-green.svg "Supported python versions: 2.7, 3.x")](https://pypi.python.org/pypi/linepy)
+ [![Version 1.5](https://img.shields.io/badge/stable-1.5-brightgreen.svg "Version 1.5")](https://pypi.python.org/pypi/linepy/1.5) [![LICENSE](https://img.shields.io/badge/license-BSD-blue.svg "LICENSE")](https://github.com/fadhiilrachman/line-py/blob/master/LICENSE) [![Supported python versions: 2.7, 3.x](https://img.shields.io/badge/python-2.7%2C%203.x-green.svg "Supported python versions: 2.7, 3.x")](https://pypi.python.org/pypi/linepy)
 
 *LINE Messaging's private API*
 
