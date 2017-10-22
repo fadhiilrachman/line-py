@@ -2,11 +2,6 @@
 from .client import LineClient
 from types import *
 
-<<<<<<< HEAD
-=======
-import urllib
-
->>>>>>> 9965d22e728aef2765228b3c149e500e6d16b7c3
 def loggedIn(func):
     def checkLogin(*args, **kwargs):
         if args[0].isLogin:
@@ -16,7 +11,6 @@ def loggedIn(func):
     return checkLogin
     
 class LineChannel(object):
-<<<<<<< HEAD
     isLogin     = False
     channelId   = None
 
@@ -30,23 +24,10 @@ class LineChannel(object):
     channelTokenExpiration  = None
 
     def __init__(self, client, channelId=None):
-=======
-    _channel = None
-    isLogin = False
-    
-    client=None
-    mid=None
-    authToken=None
-    
-    channelAccessToken = None
-
-    def __init__(self, client, channel_id=None):
->>>>>>> 9965d22e728aef2765228b3c149e500e6d16b7c3
         if type(client) is not LineClient:
             raise Exception("You need to set LineClient instance to initialize LineChannel")
         self.client = client
         self.server = client.server
-<<<<<<< HEAD
         self.channelId = channelId
         self.login()
 
@@ -195,39 +176,3 @@ class LineChannel(object):
         home = self.getProfileDetail(mid)
         params = {'userid': mid, 'oid': home["result"]["objectId"]}
         return self.server.urlEncode(self.server.LINE_OBS_DOMAIN, "/myhome/c/download.nhn", params)
-=======
-        self.mid=self.client.profile.mid
-        self.authToken=self.client.authToken
-        self._channel = self.client.channel
-        if channel_id is None:
-            channel_id='1341209950'
-        self.login(channel_id=channel_id)
-
-    def login(self, channel_id=None):
-        result = self._channel.issueChannelToken(channel_id)
-        
-        self.isLogin = True
-        self.channelAccessToken = result.channelAccessToken
-        
-        self.server.set_channelHeaders('X-Line-Mid', self.mid)
-        self.server.set_channelHeaders('X-LCT', self.channelAccessToken)
-        
-    """MYHOME"""
-
-    @loggedIn
-    def getHome(self, mid):
-        if mid is None:
-            mid=self.mid
-        params = {'homeId': mid, 'commentLimit': '1', 'sourceType': 'LINE_PROFILE_COVER', 'likeLimit': '1'}
-        url = self.server.LINE_HOST_DOMAIN + '/mh/api/v27/post/list.json?' + urllib.parse.urlencode(params)
-        r = self.server.get_content(url, headers=self.server.channelHeaders)
-        return r.json()
-    
-    @loggedIn
-    def getCover(self, mid):
-        if mid is None:
-            mid=self.mid
-        home = self.getHome(mid)
-        objId = home["result"]["homeInfo"]["objectId"]
-        return self.server.LINE_OBS_DOMAIN + "/myhome/c/download.nhn?userid=" + mid + "&oid=" + objId
->>>>>>> 9965d22e728aef2765228b3c149e500e6d16b7c3
