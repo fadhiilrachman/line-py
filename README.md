@@ -58,4 +58,8 @@ Fadhiil Rachman / [@fadhiilrachman](https://www.instagram.com/fadhiilrachman)
 
 ### Special thanks
 - [carpedm20](https://github.com/carpedm20)
+<<<<<<< HEAD
 - [Matti Virkkunen](http://altrepo.eu/git/line-protocol)
+=======
+- [Matti Virkkunen](http://altrepo.eu/git/line-protocol)
+>>>>>>> 9965d22e728aef2765228b3c149e500e6d16b7c3
