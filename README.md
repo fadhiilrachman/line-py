@@ -1,53 +1,62 @@
 # ![logo](/examples/assets/LINE-sm.png) LINE Python
 
- [![Version 1.5](https://img.shields.io/badge/stable-1.5-brightgreen.svg "Version 1.5")](https://pypi.python.org/pypi/linepy/1.5) [![LICENSE](https://img.shields.io/badge/license-BSD-blue.svg "LICENSE")](https://github.com/fadhiilrachman/line-py/blob/master/LICENSE) [![Supported python versions: 2.7, 3.x](https://img.shields.io/badge/python-2.7%2C%203.x-green.svg "Supported python versions: 2.7, 3.x")](https://pypi.python.org/pypi/linepy) [![Supported python versions: 2.7, 3.x](https://img.shields.io/badge/chat-on%20discord-7289da.svg "Chat on Discord")](https://discord.gg/JAA2uk6)
+ [![Version 1.6.0](https://img.shields.io/badge/stable-1.6.0-brightgreen.svg "Version 1.6.0")](https://pypi.python.org/pypi/linepy/1.6.0) [![LICENSE](https://img.shields.io/badge/license-BSD-blue.svg "LICENSE")](https://github.com/fadhiilrachman/line-py/blob/master/LICENSE) [![Supported python versions: 2.7, 3.x](https://img.shields.io/badge/python-2.7%2C%203.x-green.svg "Supported python versions: 2.7, 3.x")](https://pypi.python.org/pypi/linepy) [![Supported python versions: 2.7, 3.x](https://img.shields.io/badge/chat-on%20discord-7289da.svg "Chat on Discord")](https://discord.gg/JAA2uk6)
 
 *LINE Messaging's private API*
 
 ----
 
-### Installation
+## Requirement
 
-Python 2.x :
-```sh
-$ pip2 install linepy
-```
-Python 3.x :
-```sh
-$ pip3 install linepy
-```
-- **Requires:** [Python 3.x](https://www.python.org/downloads/) (Works with Python 2.x, but i recommend for 2.7)
+The linepy module only requires Python 2.7, or Python 3. You can download from [here](https://www.python.org/downloads/). 
 
-### Updating
+## Installation
 
-Python 2.x :
+Installation is simple. It can be installed from pip using the following command:
 ```sh
-$ pip2 install linepy --upgrade
+$ pip install linepy
 ```
-Python 3.x :
+Or from the code:
 ```sh
-$ pip3 install linepy --upgrade
+$ python setup.py install
 ```
 
-### Special thanks
-- [carpedm20](https://github.com/carpedm20)
-- [Matti Virkkunen](http://altrepo.eu/git/line-protocol)
-
-Update
-------
-
-**2017.10.16**
-
-Initial release
-
-## How to use
+## Usage
 
 ```python
-from linepy import *
-client = LineClient()
-client.log("Auth Token : " + str(client.authToken))
+>>> from linepy import *
+>>> client = LineClient()
+>>> client.log("Auth Token : " + str(client.authToken))
 ```
 
 ### Examples
 
 All examples can be found [here](https://github.com/fadhiilrachman/line-py/tree/master/examples).
+
+## Updates
+
+From pip using the following command:
+```sh
+$ pip install linepy --upgrade
+```
+
+Update
+------
+
+**2017.10.23**
+
+* Improve multi login from instance LineClient
+* QR login now showing QR ASCII from terminal with [PyQRCode](https://pypi.python.org/pypi/PyQRCode)
+* Now you can send media (image, video, audio, file) with URL
+* Implement LINE Timeline
+
+**2017.10.16**
+
+Initial release
+
+## Author
+Fadhiil Rachman / [@fadhiilrachman](https://www.instagram.com/fadhiilrachman)
+
+### Special thanks
+- [carpedm20](https://github.com/carpedm20)
+- [Matti Virkkunen](http://altrepo.eu/git/line-protocol)
