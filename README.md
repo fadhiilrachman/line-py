@@ -40,8 +40,7 @@ From pip using the following command:
 $ pip install linepy --upgrade
 ```
 
-Update
-------
+### Change Log
 
 **2017.10.23**
 
