@@ -105,7 +105,7 @@ class LineClient(LineApi, LineModels):
             text=text+list_text
         i=0
         for l in data:
-            mid=l[0]
+            mid=l
             name='@[list-'+str(i)+']'
             ln_text=text.replace('\n',' ')
             length_n=len(name)
