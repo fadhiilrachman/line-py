@@ -108,7 +108,7 @@ class LineChannel(object):
         url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/comment/create', params)
         data = {
             'commentText': text,
-            'activityExternalId': postId,
+            'postId': postId,
             'actorId': mid
         }
         r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
@@ -126,7 +126,7 @@ class LineChannel(object):
         url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/comment/delete', params)
         data = {
             'commentId': commentId,
-            'activityExternalId': postId,
+            'postId': postId,
             'actorId': mid
         }
         r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
@@ -146,7 +146,7 @@ class LineChannel(object):
         url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/like/create', params)
         data = {
             'likeType': likeType,
-            'activityExternalId': postId,
+            'postId': postId,
             'actorId': mid
         }
         r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
@@ -161,7 +161,7 @@ class LineChannel(object):
         params = {'homeId': mid, 'sourceType': 'TIMELINE'}
         url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/like/cancel', params)
         data = {
-            'activityExternalId': postId,
+            'postId': postId,
             'actorId': mid
         }
         r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)

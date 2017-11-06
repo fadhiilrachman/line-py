@@ -15,7 +15,10 @@ def loggedIn(func):
 class LineModels(object):
         
     """Text"""
-    
+    def __init__(self):
+        if self.isLogin == True:
+            self.log("[%s] : Login success" % self.profile.displayName)
+
     def log(self, text):
         print("[%s] %s" % (str(datetime.now()), text))
 

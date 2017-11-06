@@ -5,7 +5,7 @@ import re, json, requests, urllib
 class LineServer(object):
     LINE_HOST_DOMAIN            = 'https://gd2.line.naver.jp'
     LINE_OBS_DOMAIN             = 'https://obs-sg.line-apps.com'
-    LINE_TIMELINE_API           = 'http://gd2.line.naver.jp/mh/api'
+    LINE_TIMELINE_API           = 'https://gd2.line.naver.jp/mh/api'
 
     LINE_AUTH_QUERY_PATH        = '/api/v4/TalkService.do'
 
@@ -15,9 +15,9 @@ class LineServer(object):
     LINE_CERTIFICATE_PATH       = '/Q'
     LINE_CHAN_QUERY_PATH        = '/CH4'
 
-    USER_AGENT  = 'Line/7.13.1'
+    USER_AGENT  = 'Line/5.3.3'
     APP_TYPE    = ApplicationType.IOS
-    APP_NAME    = 'IOSIPAD\t7.13.1\tiPhone OS\t10.12.0'
+    APP_NAME    = 'DESKTOPMAC\t5.3.3-YOSEMITE-x64\tMAC\t10.12.0'
     PHONE_NAME  = 'IOS\t7.13.1\tiPhone OS\t10.12.0'
     CARRIER     = '1-0'
     SYSTEM_NAME = 'FDLRCN'
@@ -50,7 +50,7 @@ class LineServer(object):
     def setHeaders(self, argument, value):
         self.Headers[argument] = value
 
-    def setchannelHeaders(self, argument, value):
+    def setChannelHeaders(self, argument, value):
         self.channelHeaders[argument] = value
 
     def postContent(self, url, data=None, files=None, headers=None):

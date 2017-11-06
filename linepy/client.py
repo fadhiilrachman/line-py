@@ -32,9 +32,6 @@ class LineClient(LineApi, LineModels):
         self.groups     = self._client.getGroupIdsJoined()
 
         LineModels.__init__(self)
-        
-        if self.isLogin == True:
-            self.log("[%s] : Login success" % self.profile.displayName)
 
     """User"""
 
@@ -75,23 +72,28 @@ class LineClient(LineApi, LineModels):
     """Message"""
 
     @loggedIn
-    def sendMessage(self, to, text, contentMetadata={}, contentType=0, contentPreview={}):
+    def sendMessage(self, to, text, contentMetadata={}, contentType=0):
         msg = Message()
         msg.to, msg._from = to, self.profile.mid
         msg.text = text
-        msg.contentPreview, msg.contentType, msg.contentMetadata = contentPreview, contentType, contentMetadata
+        msg.contentType, msg.contentMetadata = contentType, contentMetadata
         if to not in self._messageReq:
             self._messageReq[to] = -1
         self._messageReq[to] += 1
         return self._client.sendMessage(self._messageReq[to], msg)
-
+    
+    """ Usage:
+        @to Integer
+        @text String
+        @dataMid List
+    """
     @loggedIn
-    def sendMessageWithMention(self, to, text='', data=[]):
+    def sendMessageWithMention(self, to, text='', dataMid=[]):
         arr = []
         list_text=''
         if '[list]' in text.lower():
             i=0
-            for l in data:
+            for l in dataMid:
                 list_text+='\n@[list-'+str(i)+']'
                 i=i+1
             text=text.replace('[list]', list_text)
@@ -99,19 +101,18 @@ class LineClient(LineApi, LineModels):
             text=text
         else:
             i=0
-            for l in data:
+            for l in dataMid:
                 list_text+=' @[list-'+str(i)+']'
                 i=i+1
             text=text+list_text
         i=0
-        for l in data:
-            mid=l[0]
+        for l in dataMid:
+            mid=l
             name='@[list-'+str(i)+']'
             ln_text=text.replace('\n',' ')
-            length_n=len(name)
             if ln_text.find(name):
                 line_s=int( ln_text.index(name) )
-                line_e=(int(line_s)+int(length_n))
+                line_e=(int(line_s)+int( len(name) ))
             arrData={'S': str(line_s), 'E': str(line_e), 'M': mid}
             arr.append(arrData)
             i=i+1
