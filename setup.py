@@ -63,6 +63,6 @@ with open('README.rst') as f:
             'akad',
             'requests',
             'rsa',
-            'pyqrcode'
+            'PyQRCode'
         ],
     )

@@ -97,14 +97,14 @@ class LineApi(object):
             self.certificate = result.certificate
             self.tokenLogin(result.authToken)
 
-    def qrLogin(self, keepLoggedIn=True, systemName=None, showQr=False):
+    def qrLogin(self, keepLoggedIn=True, systemName=None):
         if systemName is None:
             systemName=self.server.SYSTEM_NAME
 
         self._client = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_AUTH_QUERY_PATH).Talk(isopen=False)
         qrCode = self._client.getAuthQrcode(keepLoggedIn, systemName)
 
-        self.callback.QrUrl("line://au/q/" + qrCode.verifier, showQr)
+        self.callback.QrUrl("line://au/q/" + qrCode.verifier, True)
         self.server.setHeaders('X-Line-Access', qrCode.verifier)
 
         getAccessKey = self.server.getJson(self.server.parseUrl(self.server.LINE_CERTIFICATE_PATH), allowHeader=True)

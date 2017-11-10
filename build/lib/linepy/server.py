@@ -15,11 +15,11 @@ class LineServer(object):
     LINE_CERTIFICATE_PATH       = '/Q'
     LINE_CHAN_QUERY_PATH        = '/CH4'
 
-    USER_AGENT  = 'Line/7.14.0'
+    USER_AGENT  = 'Line/5.3.3'
     APP_TYPE    = ApplicationType.IOS
     APP_NAME    = 'DESKTOPMAC\t5.3.3-YOSEMITE-x64\tMAC\t10.12.0'
-    PHONE_NAME  = 'IOS\t7.14.0\tiPhone OS\t10.12.0'
-    CARRIER     = '51089, 1-0'
+    PHONE_NAME  = 'IOS\t7.13.1\tiPhone OS\t10.12.0'
+    CARRIER     = '1-0'
     SYSTEM_NAME = 'FDLRCN'
     IP_ADDR     = '8.8.8.8'
     EMAIL_REGEX = re.compile(r"[^@]+@[^@]+\.[^@]+")
@@ -47,22 +47,11 @@ class LineServer(object):
         else:
             return json.loads(self._session.get(url, headers=self.Headers).text)
 
-    def setHeadersWithDict(self, headersDict):
-        self.Headers.update(headersDict)
-
     def setHeaders(self, argument, value):
         self.Headers[argument] = value
 
-    def setChannelHeadersWithDict(self, headersDict):
-        self.channelHeaders.update(headersDict)
-
     def setChannelHeaders(self, argument, value):
         self.channelHeaders[argument] = value
-
-    def optionsContent(self, url, data=None, files=None, headers=None):
-        if headers is None:
-            headers=self.Headers
-        return self._session.options(url, headers=headers, data=data, files=files)
 
     def postContent(self, url, data=None, files=None, headers=None):
         if headers is None:

@@ -16,16 +16,16 @@ def loggedIn(func):
 
 class LineClient(LineApi, LineModels):
 
-    def __init__(self, id=None, passwd=None, authToken=None, certificate=None, systemName=None, showQr=False, keepLoggedIn=True):
+    def __init__(self, _id=None, passwd=None, authToken=None, certificate=None, systemName=None, keepLoggedIn=True):
         
         LineApi.__init__(self)
 
-        if not (authToken or id and passwd):
-            self.qrLogin(keepLoggedIn=keepLoggedIn, systemName=systemName, showQr=showQr)
+        if not (authToken or _id and passwd):
+            self.qrLogin(keepLoggedIn=keepLoggedIn, systemName=systemName)
         if authToken:
             self.tokenLogin(authToken=authToken)
-        if id and passwd:
-            self.login(_id=id, passwd=passwd, certificate=certificate, systemName=systemName, keepLoggedIn=keepLoggedIn)
+        if _id and passwd:
+            self.login(_id=_id, passwd=passwd, certificate=certificate, systemName=systemName, keepLoggedIn=keepLoggedIn)
 
         self._messageReq = {}
         self.profile    = self._client.getProfile()
@@ -85,7 +85,7 @@ class LineClient(LineApi, LineModels):
     """ Usage:
         @to Integer
         @text String
-        @dataMid List of user Mid
+        @dataMid List
     """
     @loggedIn
     def sendMessageWithMention(self, to, text='', dataMid=[]):
