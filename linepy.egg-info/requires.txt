@@ -1,4 +1,4 @@
 akad
 requests
 rsa
-pyqrcode
+PyQRCode

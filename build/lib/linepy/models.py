@@ -23,10 +23,6 @@ class LineModels(object):
         print("[%s] %s" % (str(datetime.now()), text))
 
     """Personalize"""
-
-    @loggedIn
-    def updateProfilePicture(self, hash_id):
-        return self.updateProfileAttribute(8, hash_id)
     
     @loggedIn
     def cloneContactProfile(self, mid):
@@ -35,8 +31,64 @@ class LineModels(object):
         profile.displayName = contact.displayName
         profile.statusMessage = contact.statusMessage
         profile.pictureStatus = contact.pictureStatus
-        self.updateProfilePicture(profile.pictureStatus)
+        self.updateProfileAttribute(8, profile.pictureStatus)
         return self.updateProfile(profile)
+
+    @loggedIn
+    def updateProfilePicture(self, path):
+        file=open(path, 'rb')
+        files = {
+            'file': file
+        }
+        params = {
+            'name': 'media',
+            'type': 'image',
+            'oid': self.profile.mid,
+            'ver': '1.0',
+        }
+        data={
+            'params': json.dumps(params)
+        }
+        r = self._server.post_content(self.server.LINE_OBS_DOMAIN + '/talk/p/upload.nhn', data=data, files=files)
+        if r.status_code != 201:
+            raise Exception('Update profile picture failure.')
+        return True
+
+    # It's still development, if you have a working code please pull it on linepy GitHub Repo
+    @loggedIn
+    def updateProfileCover(self, path):
+        if len(self.server.channelHeaders) < 1:
+            raise Exception('LineChannel is required for acquire this action.')
+        else:
+            headers, optionsHeaders={}, {}
+            optionsHeaders.update(self.server.channelHeaders)
+            optionsHeaders.update({
+                'access-control-request-headers': 'content-type,x-obs-params,x-obs-userdata,X-Line-ChannelToken',
+                'access-control-request-method': 'POST'
+            })
+            opt_r = self.server.optionsContent(self.server.LINE_OBS_DOMAIN + '/myhome/c/upload.nhn', headers=optionsHeaders)
+            if opt_r.status_code == 200:
+                headers.update(self.server.channelHeaders)
+                self.server.setChannelHeaders('Content-Type', 'image/jpeg')
+                file=open(path, 'rb')
+                files = {
+                    'file': file
+                }
+                params = {
+                    'name': 'media',
+                    'type': 'image',
+                    'userid': self.profile.mid,
+                    'ver': '1.0',
+                }
+                data={
+                    'params': json.dumps(params)
+                }
+                r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/myhome/c/upload.nhn', data=data, files=files)
+                if r.status_code != 201:
+                    raise Exception('Update profile cover failure.')
+                return True
+            else:
+                raise Exception('Cannot set options headers.')
 
     """Object"""
 
@@ -44,7 +96,7 @@ class LineModels(object):
         if returnAs not in ['path','bool','bin']:
             raise Exception('Invalid returnAs value')
         if saveAs == '':
-            saveAs = '%s/linepy-%i.data' % (tempfile.gettempdir(), randint(0, 9))
+            saveAs = '%s/linepy-%i-%s.bin' % (tempfile.gettempdir(), randint(0, 9), datetime.timestamp())
         r = self.server.getContent(fileUrl)
         if r.status_code == 200:
             if returnAs in ['path','bool']:
@@ -60,9 +112,9 @@ class LineModels(object):
             raise Exception('Download file failure.')
 
     @loggedIn
-    def downloadObjectMsgId(self, path, messageId, returnAs='path', saveAs=''):
+    def downloadObjectMsg(self, path, messageId, returnAs='path', saveAs=''):
         if saveAs == '':
-            saveAs = '%s/%s-%i.bin' % (tempfile.gettempdir(), messageId, randint(0, 9))
+            saveAs = '%s/linepy-%s-%i-%s.bin' % (tempfile.gettempdir(), messageId, randint(0, 9), datetime.timestamp())
         if returnAs not in ['path','bool','bin']:
             raise Exception('Invalid returnAs value')
         params = {'oid': messageId}
@@ -80,6 +132,24 @@ class LineModels(object):
                 return r.raw
         else:
             raise Exception('Download object failure.')
+
+    @loggedIn
+    def forwardObjectMsg(self, to, msgId, contentType='image'):
+        if contentType not in ['image','video','audio']:
+            raise Exception('Type not valid.')
+        data = {
+            'name': 'media',
+            'oid': 'reqseq',
+            'reqseq': self.revision,
+            'type': contentType,
+            'tomid': to,
+            'copyFrom': '/talk/m/%s' % msgId,
+            'ver': '1.0',
+        }
+        r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/m/copy.nhn', data=data)
+        if r.status_code != 200:
+            raise Exception('Forward object failure.')
+        return True
         
     @loggedIn
     def sendImage(self, to, path):
@@ -104,7 +174,7 @@ class LineModels(object):
 
     @loggedIn
     def sendImageWithURL(self, to, url):
-        path = self.downloadFileURL(self, url, returnAs='path')
+        path = self.downloadFileURL(url, 'path')
         try:
             return self.sendImage(to, path)
         except:
@@ -137,7 +207,7 @@ class LineModels(object):
 
     @loggedIn
     def sendVideoWithURL(self, to, url):
-        path = self.downloadFileURL(self, url, returnAs='path')
+        path = self.downloadFileURL(url, 'path')
         try:
             return self.sendVideo(to, path)
         except:
@@ -166,7 +236,7 @@ class LineModels(object):
 
     @loggedIn
     def sendAudioWithURL(self, to, url):
-        path = self.downloadFileURL(self, url, returnAs='path')
+        path = self.downloadFileURL(url, 'path')
         try:
             return self.sendAudio(to, path)
         except:
@@ -203,7 +273,7 @@ class LineModels(object):
 
     @loggedIn
     def sendFileWithURL(self, to, url, fileName=''):
-        path = self.downloadFileURL(self, url, returnAs='path')
+        path = self.downloadFileURL(url, 'path')
         try:
             return self.sendFile(to, path, fileName)
         except:

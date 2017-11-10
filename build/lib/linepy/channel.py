@@ -47,11 +47,14 @@ class LineChannel(object):
 
     def createSession(self):
         if self.isLogin:
-            self.server.setChannelHeaders('Content-Type', 'application/json')
-            self.server.setChannelHeaders('User-Agent', self.server.USER_AGENT)
-            self.server.setChannelHeaders('X-Line-Mid', self.client.profile.mid)
-            self.server.setChannelHeaders('X-LCT', self.channelAccessToken)
-            
+            self.server.setChannelHeadersWithDict({
+                'Content-Type': 'application/json',
+                'User-Agent': self.server.USER_AGENT,
+                'X-Line-Mid': self.client.profile.mid,
+                'X-Line-Carrier': self.server.CARRIER,
+                'X-Line-Application': self.server.APP_NAME,
+                'X-Line-ChannelToken': self.channelAccessToken
+            })
             channelInfo = self.getChannelInfo(self.channelId)
             self.client.log('[%s] Success login to %s' % (self.client.profile.displayName, channelInfo.name))
 
@@ -72,6 +75,7 @@ class LineChannel(object):
     @loggedIn
     def getFeed(self, postLimit=10, commentLimit=1, likeLimit=1, order='TIME'):
         params = {'postLimit': postLimit, 'commentLimit': commentLimit, 'likeLimit': likeLimit, 'order': order}
+        self.server.setChannelHeaders('Content-Type', 'application/json')
         url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v27/feed/list', params)
         r = self.server.getContent(url, headers=self.server.channelHeaders)
         return r.json()
