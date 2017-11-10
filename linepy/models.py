@@ -54,40 +54,41 @@ class LineModels(object):
             raise Exception('Update profile picture failure.')
         return True
 
+    # It's still development, if you have a working code please pull it on linepy GitHub Repo
     @loggedIn
     def updateProfileCover(self, path):
-        # It's still development, if you have a working code please pull it on linepy GitHub Repo
         if len(self.server.channelHeaders) < 1:
             raise Exception('LineChannel is required for acquire this action.')
-        headers, optionsHeaders={}, {}
-        optionsHeaders.update(self.server.channelHeaders)
-        optionsHeaders.update({
-            'access-control-request-headers': 'content-type,x-obs-params,x-obs-userdata,X-Line-ChannelToken',
-            'access-control-request-method': 'POST'
-        })
-        opt_r = self.server.optionsContent(self.server.LINE_OBS_DOMAIN + '/myhome/c/upload.nhn', headers=optionsHeaders)
-        if opt_r.status_code == 200:
-            headers.update(self.server.channelHeaders)
-            self.server.setChannelHeaders('Content-Type', 'image/jpeg')
-            file=open(path, 'rb')
-            files = {
-                'file': file
-            }
-            params = {
-                'name': 'media',
-                'type': 'image',
-                'userid': self.profile.mid,
-                'ver': '1.0',
-            }
-            data={
-                'params': json.dumps(params)
-            }
-            r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/myhome/c/upload.nhn', data=data, files=files)
-            if r.status_code != 201:
-                raise Exception('Update profile cover failure.')
-            return True
         else:
-            raise Exception('Cannot set options headers.')
+            headers, optionsHeaders={}, {}
+            optionsHeaders.update(self.server.channelHeaders)
+            optionsHeaders.update({
+                'access-control-request-headers': 'content-type,x-obs-params,x-obs-userdata,X-Line-ChannelToken',
+                'access-control-request-method': 'POST'
+            })
+            opt_r = self.server.optionsContent(self.server.LINE_OBS_DOMAIN + '/myhome/c/upload.nhn', headers=optionsHeaders)
+            if opt_r.status_code == 200:
+                headers.update(self.server.channelHeaders)
+                self.server.setChannelHeaders('Content-Type', 'image/jpeg')
+                file=open(path, 'rb')
+                files = {
+                    'file': file
+                }
+                params = {
+                    'name': 'media',
+                    'type': 'image',
+                    'userid': self.profile.mid,
+                    'ver': '1.0',
+                }
+                data={
+                    'params': json.dumps(params)
+                }
+                r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/myhome/c/upload.nhn', data=data, files=files)
+                if r.status_code != 201:
+                    raise Exception('Update profile cover failure.')
+                return True
+            else:
+                raise Exception('Cannot set options headers.')
 
     """Object"""
 
