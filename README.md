@@ -40,7 +40,14 @@ From pip using the following command:
 $ pip install linepy --upgrade
 ```
 
+
 ### Change Log
+
+**2017.11.10**
+
+* Now you can forward object message with forwardObjectMsg
+* Implement profile personalization with updateProfilePicture and updateProfileCover
+* Improve LineChannel and LineServer
 
 **2017.11.06**
 
