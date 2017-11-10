@@ -1,6 +1,10 @@
 # ![logo](/examples/assets/LINE-sm.png) LINE Python
 
+<<<<<<< HEAD
  [![Version 1.6.5](https://img.shields.io/badge/stable-1.6.5-brightgreen.svg "Version 1.6.5")](https://pypi.python.org/pypi/linepy) [![LICENSE](https://img.shields.io/badge/license-BSD-blue.svg "LICENSE")](https://github.com/fadhiilrachman/line-py/blob/master/LICENSE) [![Supported python versions: 2.7, 3.x](https://img.shields.io/badge/python-2.7%2C%203.x-green.svg "Supported python versions: 2.7, 3.x")](https://pypi.python.org/pypi/linepy) [![Supported python versions: 2.7, 3.x](https://img.shields.io/badge/chat-on%20discord-7289da.svg "Chat on Discord")](https://discord.gg/JAA2uk6)
+=======
+ [![Version 1.6.4](https://img.shields.io/badge/stable-1.6.4-brightgreen.svg "Version 1.6.4")](https://pypi.python.org/pypi/linepy) [![LICENSE](https://img.shields.io/badge/license-BSD-blue.svg "LICENSE")](https://github.com/fadhiilrachman/line-py/blob/master/LICENSE) [![Supported python versions: 2.7, 3.x](https://img.shields.io/badge/python-2.7%2C%203.x-green.svg "Supported python versions: 2.7, 3.x")](https://pypi.python.org/pypi/linepy) [![Supported python versions: 2.7, 3.x](https://img.shields.io/badge/chat-on%20discord-7289da.svg "Chat on Discord")](https://discord.gg/JAA2uk6)
+>>>>>>> b703c896461daa689657451e5de4269f1ca73a63
 
 *LINE Messaging's private API*
 
@@ -41,13 +45,6 @@ $ pip install linepy --upgrade
 ```
 
 ### Change Log
-
-**2017.11.10**
-
-* Implement object message in forwardObjectMsg
-* Implement personalization in updateProfilePicture and updateProfileCover
-* Improve LineChannel and LineServer
-* You can set manually showing QR Code if login with QR
 
 **2017.11.06**
 
