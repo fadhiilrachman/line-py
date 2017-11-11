@@ -43,6 +43,10 @@ $ pip install linepy --upgrade
 
 ### Change Log
 
+**2017.11.11**
+
+* Fix some error and typo in LineModels
+
 **2017.11.10**
 
 * Now you can forward object message with forwardObjectMsg

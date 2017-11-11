@@ -14,8 +14,10 @@ class LineApi(object):
     def __init__(self):
         self.server = LineServer()
         self.callback = LineCallback(self.defaultCallback)
-        self.server.setHeaders('User-Agent', self.server.USER_AGENT)
-        self.server.setHeaders('X-Line-Application', self.server.APP_NAME)
+        self.server.setHeadersWithDict({
+            'X-Line-Application': self.server.APP_NAME,
+            'User-Agent': self.server.USER_AGENT
+        })
 
     def loadSession(self):
         self._client    = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_API_QUERY_PATH_FIR).Talk()
@@ -34,8 +36,10 @@ class LineApi(object):
         else:
             self.provider = IdentityProvider.NAVER_KR   # NAVER
         
-        self.server.setHeaders('X-Line-Application', self.server.PHONE_NAME)
-        self.server.setHeaders('X-Line-Carrier', self.server.CARRIER)
+        self.server.setHeadersWithDict({
+            'X-Line-Application': self.server.PHONE_NAME,
+            'X-Line-Carrier': self.server.CARRIER
+        })
         self._client = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_AUTH_QUERY_PATH).Talk(isopen=False)
 
         rsaKey = self._client.getRSAKeyInfo(self.provider)
