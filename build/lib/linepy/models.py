@@ -2,7 +2,7 @@
 from datetime import datetime
 from random import randint
 
-import json, shutil, tempfile
+import json, shutil, tempfile, time
 
 def loggedIn(func):
     def checkLogin(*args, **kwargs):
@@ -49,7 +49,7 @@ class LineModels(object):
         data={
             'params': json.dumps(params)
         }
-        r = self._server.post_content(self.server.LINE_OBS_DOMAIN + '/talk/p/upload.nhn', data=data, files=files)
+        r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/p/upload.nhn', data=data, files=files)
         if r.status_code != 201:
             raise Exception('Update profile picture failure.')
         return True
@@ -96,7 +96,7 @@ class LineModels(object):
         if returnAs not in ['path','bool','bin']:
             raise Exception('Invalid returnAs value')
         if saveAs == '':
-            saveAs = '%s/linepy-%i-%s.bin' % (tempfile.gettempdir(), randint(0, 9), datetime.timestamp())
+            saveAs = '%s/linepy-%i-%i.bin' % (tempfile.gettempdir(), randint(0, 9), int(time.time()))
         r = self.server.getContent(fileUrl)
         if r.status_code == 200:
             if returnAs in ['path','bool']:
@@ -114,7 +114,7 @@ class LineModels(object):
     @loggedIn
     def downloadObjectMsg(self, path, messageId, returnAs='path', saveAs=''):
         if saveAs == '':
-            saveAs = '%s/linepy-%s-%i-%s.bin' % (tempfile.gettempdir(), messageId, randint(0, 9), datetime.timestamp())
+            saveAs = '%s/linepy-%s-%i-%i.bin' % (tempfile.gettempdir(), messageId, randint(0, 9), int(time.time()))
         if returnAs not in ['path','bool','bin']:
             raise Exception('Invalid returnAs value')
         params = {'oid': messageId}
@@ -175,10 +175,7 @@ class LineModels(object):
     @loggedIn
     def sendImageWithURL(self, to, url):
         path = self.downloadFileURL(url, 'path')
-        try:
-            return self.sendImage(to, path)
-        except:
-            raise Exception('Send image failure.')
+        return self.sendImage(to, path)
 
     @loggedIn
     def sendVideo(self, to, path):
@@ -208,10 +205,7 @@ class LineModels(object):
     @loggedIn
     def sendVideoWithURL(self, to, url):
         path = self.downloadFileURL(url, 'path')
-        try:
-            return self.sendVideo(to, path)
-        except:
-            raise Exception('Send video failure.')
+        return self.sendVideo(to, path)
 
     @loggedIn
     def sendAudio(self, to, path):
@@ -237,10 +231,7 @@ class LineModels(object):
     @loggedIn
     def sendAudioWithURL(self, to, url):
         path = self.downloadFileURL(url, 'path')
-        try:
-            return self.sendAudio(to, path)
-        except:
-            raise Exception('Send audio failure.')
+        return self.sendAudio(to, path)
 
     @loggedIn
     def sendFile(self, to, path, file_name=''):
@@ -274,7 +265,4 @@ class LineModels(object):
     @loggedIn
     def sendFileWithURL(self, to, url, fileName=''):
         path = self.downloadFileURL(url, 'path')
-        try:
-            return self.sendFile(to, path, fileName)
-        except:
-            raise Exception('Send file failure.')
+        return self.sendFile(to, path, fileName)
