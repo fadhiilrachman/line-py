@@ -93,7 +93,7 @@ class LineModels(object):
         return True
         
     @loggedIn
-    def changeProfileVideoPicture(self, path):
+    def updateProfileVideoPicture(self, path):
         try:
             from ffmpy import FFmpeg
             file=open(path, 'rb')
