@@ -42,6 +42,13 @@ $ pip install linepy --upgrade
 
 ### Change Log
 
+**2017.11.16**
+
+* Fixing updateProfileCover (Is still working on beta)
+* Implement profile personalization with updateProfileVideoPicture
+* Improve LineChannel and LineModels
+* Add LINE_SQUARE_QUERY_PATH in LineServer instance for LINE Square *soon
+
 **2017.11.11**
 
 * Fix some error and typo in LineModels

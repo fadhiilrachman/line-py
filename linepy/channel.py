@@ -11,8 +11,9 @@ def loggedIn(func):
     return checkLogin
     
 class LineChannel(object):
-    isLogin     = False
-    channelId   = None
+    isLogin       = False
+    channelId     = None
+    profileDetail = None
 
     client      = None
     server      = None
@@ -33,7 +34,7 @@ class LineChannel(object):
 
     def login(self):
         if self.channelId is None:
-            self.channelId='1341209950'     # Timeline Channel Id
+            self.channelId=self.server.CHANNEL_ID['LINE_TIMELINE']
         result = self.approveChannelAndIssueChannelToken(self.channelId)
         
         self.channelAccessToken     = result.channelAccessToken
@@ -55,8 +56,11 @@ class LineChannel(object):
                 'X-Line-Application': self.server.APP_NAME,
                 'X-Line-ChannelToken': self.channelAccessToken
             })
+            self.client.setChannelToModels(self)
             channelInfo = self.getChannelInfo(self.channelId)
             self.client.log('[%s] Success login to %s' % (self.client.profile.displayName, channelInfo.name))
+            if self.channelId == self.server.CHANNEL_ID['LINE_TIMELINE']:
+                self.profileDetail = self.getProfileDetail()
 
     def approveChannelAndIssueChannelToken(self, channelId):
         return self.client.channel.approveChannelAndIssueChannelToken(channelId)

@@ -30,7 +30,7 @@ with open('README.rst') as f:
         name='linepy',
         packages=['linepy'],
         version=version,
-        license='BSD License',
+        license='BSD 3 Clause License',
         author='Fadhiil Rachman',
         author_email='fadhiilrachman@gmail.com',
         url='https://github.com/fadhiilrachman/line-py',

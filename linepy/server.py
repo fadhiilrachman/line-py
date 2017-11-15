@@ -14,6 +14,13 @@ class LineServer(object):
     LINE_CALL_QUERY_PATH        = '/V4'
     LINE_CERTIFICATE_PATH       = '/Q'
     LINE_CHAN_QUERY_PATH        = '/CH4'
+    LINE_SQUARE_QUERY_PATH      = '/SQS1'
+
+    CHANNEL_ID = {
+        'LINE_TIMELINE': '1341209950',
+        'LINE_WEBTOON': '1401600689',
+        'LINE_TODAY': '1518712866'
+    }
 
     USER_AGENT  = 'Line/7.14.0'
     APP_TYPE    = ApplicationType.IOS

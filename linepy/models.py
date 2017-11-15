@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+from .client import LineChannel
 from datetime import datetime
 from random import randint
 
-import json, shutil, tempfile, time
+import json, shutil, time
 
 def loggedIn(func):
     def checkLogin(*args, **kwargs):
@@ -13,14 +14,51 @@ def loggedIn(func):
     return checkLogin
     
 class LineModels(object):
+
+    _channel = None
         
-    """Text"""
     def __init__(self):
         if self.isLogin == True:
             self.log("[%s] : Login success" % self.profile.displayName)
 
+    def setChannelToModels(self, channel):
+        if type(channel) is not LineChannel:
+            raise Exception("You need to set LineChannel instance")
+        self._channel = channel
+
+    def genTempFileName(self):
+        try:
+            import tempfile
+            return '%s/linepy-%s-%i.bin' % (tempfile.gettempdir(), int(time.time()), randint(0, 9))
+        except:
+            raise Exception('tempfile is required')
+
+    """Text"""
+
     def log(self, text):
         print("[%s] %s" % (str(datetime.now()), text))
+
+    """Group"""
+
+    @loggedIn
+    def updateGroupPicture(self, groupId, path):
+        file=open(path, 'rb')
+        files = {
+            'file': file
+        }
+        params = {
+            'name': 'media',
+            'type': 'image',
+            'oid': groupId,
+            'ver': '1.0'
+        }
+        data={
+            'params': json.dumps(params)
+        }
+        r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/g/upload.nhn', data=data, files=files)
+        if r.status_code != 201:
+            raise Exception('Update group picture failure.')
+        return True
 
     """Personalize"""
     
@@ -53,13 +91,59 @@ class LineModels(object):
         if r.status_code != 201:
             raise Exception('Update profile picture failure.')
         return True
+        
+    @loggedIn
+    def changeProfileVideoPicture(self, path):
+        try:
+            from ffmpy import FFmpeg
+            file=open(path, 'rb')
+            files = {
+                'file': file
+            }
+            params = {
+                'name': 'media',
+                'type': 'video',
+                'oid': self.profile.mid,
+                'ver': '2.0',
+                'cat': 'vp.mp4'
+            }
+            data={
+                'params': json.dumps(params)
+            }
+            r_p = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/vp/upload.nhn', data=data, files=files)
+            if r_p.status_code != 201:
+                raise Exception('Change profile video profile failure.')
+            path_vp = self.genTempFileName()
+            ff = FFmpeg(inputs={'%s' % path: None}, outputs={'%s' % path_vp: ['-ss', '00:00:4', '-vframes', '1']})
+            ff.run()
+            file2=open(path_vp, 'rb')
+            files = {
+                'file': file2
+            }
+            params = {
+                'name': 'media',
+                'type': 'image',
+                'oid': self.profile.mid,
+                'cat': 'vp.mp4',
+                'ver': '2.0'
+            }
+            data={
+                'params': json.dumps(params)
+            }
+            r_vp = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/p/upload.nhn', data=data, files=files)
+            if r_vp.status_code != 201:
+                raise Exception('Change profile video picture failure.')
+            return True
+        except:
+            raise Exception('You should install ffmpy from pypi >> pip install ffmpy')
 
     # It's still development, if you have a working code please pull it on linepy GitHub Repo
     @loggedIn
     def updateProfileCover(self, path):
         if len(self.server.channelHeaders) < 1:
-            raise Exception('LineChannel is required for acquire this action.')
+            raise Exception('LineChannel instance is required for acquire this action.')
         else:
+            home = self._channel.getProfileDetail(self.profile.mid)
             headers, optionsHeaders={}, {}
             optionsHeaders.update(self.server.channelHeaders)
             optionsHeaders.update({
@@ -77,6 +161,7 @@ class LineModels(object):
                 params = {
                     'name': 'media',
                     'type': 'image',
+                    'oid': home["result"]["objectId"],
                     'userid': self.profile.mid,
                     'ver': '1.0',
                 }
@@ -96,16 +181,15 @@ class LineModels(object):
         if returnAs not in ['path','bool','bin']:
             raise Exception('Invalid returnAs value')
         if saveAs == '':
-            saveAs = '%s/linepy-%i-%i.bin' % (tempfile.gettempdir(), randint(0, 9), int(time.time()))
+            saveAs = self.genTempFileName()
         r = self.server.getContent(fileUrl)
         if r.status_code == 200:
-            if returnAs in ['path','bool']:
-                with open(saveAs, 'wb') as f:
-                    shutil.copyfileobj(r.raw, f)
-                if returnAs == 'path':
-                    return saveAs
-                elif returnAs == 'bool':
-                    return True
+            with open(saveAs, 'wb') as f:
+                shutil.copyfileobj(r.raw, f)
+            if returnAs == 'path':
+                return saveAs
+            elif returnAs == 'bool':
+                return True
             elif returnAs == 'bin':
                 return r.raw
         else:
@@ -114,20 +198,19 @@ class LineModels(object):
     @loggedIn
     def downloadObjectMsg(self, path, messageId, returnAs='path', saveAs=''):
         if saveAs == '':
-            saveAs = '%s/linepy-%s-%i-%i.bin' % (tempfile.gettempdir(), messageId, randint(0, 9), int(time.time()))
+            saveAs = self.genTempFileName()
         if returnAs not in ['path','bool','bin']:
             raise Exception('Invalid returnAs value')
         params = {'oid': messageId}
         url = self.server.urlEncode(self.server.LINE_OBS_DOMAIN, '/talk/m/download.nhn', params)
         r = self.server.getContent(url)
         if r.status_code == 200:
-            if returnAs in ['path','bool']:
-                with open(saveAs, 'wb') as f:
-                    shutil.copyfileobj(r.raw, f)
-                if returnAs == 'path':
-                    return saveAs
-                elif returnAs == 'bool':
-                    return True
+            with open(saveAs, 'wb') as f:
+                shutil.copyfileobj(r.raw, f)
+            if returnAs == 'path':
+                return saveAs
+            elif returnAs == 'bool':
+                return True
             elif returnAs == 'bin':
                 return r.raw
         else:
