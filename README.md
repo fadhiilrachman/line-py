@@ -46,6 +46,7 @@ $ pip install linepy --upgrade
 
 * Fixing updateProfileCover (Still working on beta)
 * Implement profile personalization with updateProfileVideoPicture
+* Implement updateGroupPicture for group chat
 * Improve LineChannel and LineModels
 * Add LINE_SQUARE_QUERY_PATH in LineServer instance for LINE Square *soon
 
