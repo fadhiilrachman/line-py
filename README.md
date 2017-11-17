@@ -1,6 +1,6 @@
 # ![logo](/examples/assets/LINE-sm.png) LINE Python
 
- [![Version 1.7.1](https://img.shields.io/badge/stable-1.7.1-brightgreen.svg "Version 1.7.1")](https://pypi.python.org/pypi/linepy) [![LICENSE](https://img.shields.io/badge/license-BSD-blue.svg "LICENSE")](https://github.com/fadhiilrachman/line-py/blob/master/LICENSE) [![Supported python versions: 2.7, 3.x](https://img.shields.io/badge/python-2.7%2C%203.x-green.svg "Supported python versions: 2.7, 3.x")](https://pypi.python.org/pypi/linepy) [![Supported python versions: 2.7, 3.x](https://img.shields.io/badge/chat-on%20discord-7289da.svg "Chat on Discord")](https://discord.gg/JAA2uk6)
+ [![Version 1.7.2](https://img.shields.io/badge/stable-1.7.2-brightgreen.svg "Version 1.7.2")](https://pypi.python.org/pypi/linepy) [![LICENSE](https://img.shields.io/badge/license-BSD-blue.svg "LICENSE")](https://github.com/fadhiilrachman/line-py/blob/master/LICENSE) [![Supported python versions: 2.7, 3.x](https://img.shields.io/badge/python-2.7%2C%203.x-green.svg "Supported python versions: 2.7, 3.x")](https://pypi.python.org/pypi/linepy) [![Supported python versions: 2.7, 3.x](https://img.shields.io/badge/chat-on%20discord-7289da.svg "Chat on Discord")](https://discord.gg/JAA2uk6)
 
 *LINE Messaging's private API*
 
@@ -42,9 +42,13 @@ $ pip install linepy --upgrade
 
 ### Change Log
 
+**2017.11.17**
+
+* Fix some typo in LineModels
+* Fixing updateProfileCover (Still in development)
+
 **2017.11.16**
 
-* Fixing updateProfileCover (Still working on beta)
 * Implement profile personalization with updateProfileVideoPicture
 * Implement updateGroupPicture for group chat
 * Improve LineChannel and LineModels

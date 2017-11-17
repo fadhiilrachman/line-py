@@ -1,0 +1,4 @@
+akad
+requests
+rsa
+PyQRCode

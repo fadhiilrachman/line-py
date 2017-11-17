@@ -1,0 +1,60 @@
+Metadata-Version: 1.1
+Name: linepy
+Version: 1.7.2
+Summary:  LINE Messaging's private API
+Home-page: https://github.com/fadhiilrachman/line-py
+Author: Fadhiil Rachman
+Author-email: fadhiilrachman@gmail.com
+License: BSD 3 Clause License
+Description: .. contents::
+        
+        LINE Messaging's private API
+        
+        **Homepage**: https://github.com/fadhiilrachman/line-py
+        
+        Requirements
+        ============
+        The linepy module only requires Python 2.7, or Python 3
+        
+        Installation
+        ============
+        Installation is simple. It can be installed from pip using the following
+        command::
+        
+            $ pip install pyqrcode
+        
+        Or from the terminal::
+        
+            $ python setup.py install
+        
+        Usage
+        ============
+        ::
+        
+            >>> from linepy import *
+            >>> client = LineClient()
+            >>> client.log("Auth Token : " + str(client.authToken))
+        
+        All examples can be found `here <https://github.com/fadhiilrachman/line-py/tree/master/examples>`_.
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.1
+Classifier: Programming Language :: Python :: 3.2
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Classifier: Topic :: Communications :: Chat
