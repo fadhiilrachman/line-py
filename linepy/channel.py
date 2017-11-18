@@ -85,7 +85,7 @@ class LineChannel(object):
         return r.json()
 
     @loggedIn
-    def getHomeProfile(self, mid, postLimit=10, commentLimit=1, likeLimit=1):
+    def getHomeProfile(self, mid=None, postLimit=10, commentLimit=1, likeLimit=1):
         if mid is None:
             mid = self.client.profile.mid
         params = {'homeId': mid, 'postLimit': postLimit, 'commentLimit': commentLimit, 'likeLimit': likeLimit, 'sourceType': 'LINE_PROFILE_COVER'}
@@ -94,7 +94,7 @@ class LineChannel(object):
         return r.json()
 
     @loggedIn
-    def getProfileDetail(self, mid):
+    def getProfileDetail(self, mid=None):
         if mid is None:
             mid = self.client.profile.mid
         params = {'userMid': mid}
@@ -105,7 +105,7 @@ class LineChannel(object):
     """COMMENT POST"""
 
     @loggedIn
-    def createComment(self, mid, postId, text):
+    def createComment(self, mid=None, postId=None, text=None):
         if mid is None:
             mid = self.client.profile.mid
         if postId is None:
@@ -123,7 +123,7 @@ class LineChannel(object):
         return r.json()
 
     @loggedIn
-    def deleteComment(self, mid, postId, commentId):
+    def deleteComment(self, mid=None, postId=None, commentId=None):
         if mid is None:
             mid = self.client.profile.mid
         if postId is None:
@@ -143,7 +143,7 @@ class LineChannel(object):
     """LIKE POST"""
 
     @loggedIn
-    def likePost(self, mid, postId, likeType=1001):
+    def likePost(self, mid=None, postId=None, likeType=1001):
         if mid is None:
             mid = self.client.profile.mid
         if postId is None:
@@ -161,7 +161,7 @@ class LineChannel(object):
         return r.json()
 
     @loggedIn
-    def unlikePost(self, mid, postId):
+    def unlikePost(self, mid=None, postId=None):
         if mid is None:
             mid = self.client.profile.mid
         if postId is None:
@@ -178,7 +178,7 @@ class LineChannel(object):
     """Contact"""
 
     @loggedIn
-    def getProfileCoverURL(self, mid):
+    def getProfileCoverURL(self, mid=None):
         if mid is None:
             mid = self.client.profile.mid
         home = self.getProfileDetail(mid)

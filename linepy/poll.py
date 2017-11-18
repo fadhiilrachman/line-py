@@ -22,7 +22,7 @@ class LinePoll(object):
     def addOpInterrupt(self, OperationType, DisposeFunc):
         self.OpInterrupt[OperationType] = DisposeFunc
         
-    def execute(self, op, threading=False):
+    def execute(self, op, threading):
         try:
             if threading:
                 _td = threading.Thread(target=self.OpInterrupt[op.type](op))
@@ -33,7 +33,7 @@ class LinePoll(object):
         except Exception as e:
             self.client.log(str(e))
     
-    def trace(self):
+    def trace(self, threading=False):
         try:
             operations = self.fetchOperation(self.client.revision)
         except KeyboardInterrupt:
@@ -43,5 +43,5 @@ class LinePoll(object):
         
         for op in operations:
             if op.type in self.OpInterrupt.keys():
-                self.execute(op, False)
+                self.execute(op, threading)
             self.client.revision = max(op.revision, self.client.revision)

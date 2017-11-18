@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from .channel import LineChannel
 from datetime import datetime
 from random import randint
 
@@ -22,8 +21,6 @@ class LineModels(object):
             self.log("[%s] : Login success" % self.profile.displayName)
 
     def setChannelToModels(self, channel):
-        if type(channel) is not LineChannel:
-            raise Exception("You need to set LineChannel instance")
         self._channel = channel
 
     def genTempFileName(self):
@@ -110,13 +107,13 @@ class LineModels(object):
             data={
                 'params': json.dumps(params)
             }
-            r_p = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/vp/upload.nhn', data=data, files=files)
-            if r_p.status_code != 201:
+            r_vp = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/vp/upload.nhn', data=data, files=files)
+            if r_vp.status_code != 201:
                 raise Exception('Change profile video profile failure.')
-            path_vp = self.genTempFileName()
-            ff = FFmpeg(inputs={'%s' % path: None}, outputs={'%s' % path_vp: ['-ss', '00:00:4', '-vframes', '1']})
+            path_p = self.genTempFileName()
+            ff = FFmpeg(inputs={'%s' % path: None}, outputs={'%s' % path_p: ['-ss', '00:00:4', '-vframes', '1']})
             ff.run()
-            file2=open(path_vp, 'rb')
+            file2=open(path_p, 'rb')
             files = {
                 'file': file2
             }
@@ -130,12 +127,12 @@ class LineModels(object):
             data={
                 'params': json.dumps(params)
             }
-            r_vp = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/p/upload.nhn', data=data, files=files)
-            if r_vp.status_code != 201:
+            r_p = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/p/upload.nhn', data=data, files=files)
+            if r_p.status_code != 201:
                 raise Exception('Change profile video picture failure.')
             return True
         except:
-            raise Exception('You should install ffmpy from pypi >> pip install ffmpy')
+            raise Exception('You should install ffmpeg from apt and ffmpy from pypi')
 
     # It's still development, if you have a working code please pull it on linepy GitHub Repo
     @loggedIn
@@ -146,14 +143,14 @@ class LineModels(object):
             home = self._channel.getProfileDetail(self.profile.mid)
             headers= {}
             headers.update(self.server.channelHeaders)
-            self.server.setChannelHeaders('Content-Type', 'image/jpeg')
+            headers.update({'Content-Type': 'image/jpeg'})
             file=open(path, 'rb')
             files = {
                 'file': file
             }
             params = {
                 'name': 'media',
-                'type': 'image',
+                'type': 'image/jpeg',
                 'oid': home["result"]["objectId"],
                 'userid': self.profile.mid,
                 'ver': '1.0',
