@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from .client import LineClient
 from types import *
+import urllib
+import requests
+import json
 
 def loggedIn(func):
     def checkLogin(*args, **kwargs):
@@ -11,176 +14,131 @@ def loggedIn(func):
     return checkLogin
     
 class LineChannel(object):
-    isLogin       = False
-    channelId     = None
-    profileDetail = None
-
-    client      = None
-    server      = None
+    _channel = None
+    isLogin = False
     
-    channelAccessToken      = None
-    channelToken            = None
-    obsToken                = None
-    channelRefreshToken     = None
-    channelTokenExpiration  = None
+    client=None
+    mid=None
+    authToken=None
+    
+    channelAccessToken = None
 
-    def __init__(self, client, channelId=None):
+    def __init__(self, client, channel_id=None):
         if type(client) is not LineClient:
             raise Exception("You need to set LineClient instance to initialize LineChannel")
         self.client = client
         self.server = client.server
-        self.channelId = channelId
-        self.login()
+        self.mid=self.client.profile.mid
+        self.authToken=self.client.authToken
+        self._channel = self.client.channel
+        if channel_id is None:
+            channel_id='1341209950'
+        self.login(channel_id=channel_id)
 
-    def login(self):
-        if self.channelId is None:
-            self.channelId=self.server.CHANNEL_ID['LINE_TIMELINE']
-        result = self.approveChannelAndIssueChannelToken(self.channelId)
+    def login(self, channel_id=None):
+        result = self._channel.issueChannelToken(channel_id)
         
-        self.channelAccessToken     = result.channelAccessToken
-        self.channelToken           = result.token
-        self.obsToken               = result.obsToken
-        self.channelRefreshToken    = result.refreshToken
-        self.channelTokenExpiration = result.expiration
         self.isLogin = True
-
-        self.createSession()
-
-    def createSession(self):
-        if self.isLogin:
-            self.server.setChannelHeadersWithDict({
-                'Content-Type': 'application/json',
-                'User-Agent': self.server.USER_AGENT,
-                'X-Line-Mid': self.client.profile.mid,
-                'X-Line-Carrier': self.server.CARRIER,
-                'X-Line-Application': self.server.APP_NAME,
-                'X-Line-ChannelToken': self.channelAccessToken
-            })
-            self.client.setChannelToModels(self)
-            channelInfo = self.getChannelInfo(self.channelId)
-            self.client.log('[%s] Success login to %s' % (self.client.profile.displayName, channelInfo.name))
-            if self.channelId == self.server.CHANNEL_ID['LINE_TIMELINE']:
-                self.profileDetail = self.getProfileDetail()
-
-    def approveChannelAndIssueChannelToken(self, channelId):
-        return self.client.channel.approveChannelAndIssueChannelToken(channelId)
-
-    def issueChannelToken(self, channelId):
-        return self.client.channel.issueChannelToken(channelId)
-
-    def getChannelInfo(self, channelId, locale='EN'):
-        return self.client.channel.getChannelInfo(channelId, locale)
-
-    def revokeChannel(self, channelId):
-        return self.client.channel.revokeChannel(channelId)
+        self.channelAccessToken = result.channelAccessToken
         
-    """TIMELINE"""
+        self.server.set_channelHeaders('X-Line-Mid', self.mid)
+        self.server.set_channelHeaders('X-LCT', self.channelAccessToken)
+        
+    """MYHOME"""
 
     @loggedIn
-    def getFeed(self, postLimit=10, commentLimit=1, likeLimit=1, order='TIME'):
-        params = {'postLimit': postLimit, 'commentLimit': commentLimit, 'likeLimit': likeLimit, 'order': order}
-        self.server.setChannelHeaders('Content-Type', 'application/json')
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v27/feed/list', params)
-        r = self.server.getContent(url, headers=self.server.channelHeaders)
-        return r.json()
-
-    @loggedIn
-    def getHomeProfile(self, mid=None, postLimit=10, commentLimit=1, likeLimit=1):
+    def getHome(self, mid):
         if mid is None:
-            mid = self.client.profile.mid
-        params = {'homeId': mid, 'postLimit': postLimit, 'commentLimit': commentLimit, 'likeLimit': likeLimit, 'sourceType': 'LINE_PROFILE_COVER'}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v27/post/list', params)
-        r = self.server.getContent(url, headers=self.server.channelHeaders)
-        return r.json()
-
-    @loggedIn
-    def getProfileDetail(self, mid=None):
-        if mid is None:
-            mid = self.client.profile.mid
-        params = {'userMid': mid}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v1/userpopup/getDetail', params)
-        r = self.server.getContent(url, headers=self.server.channelHeaders)
-        return r.json()
-
-    """COMMENT POST"""
-
-    @loggedIn
-    def createComment(self, mid=None, postId=None, text=None):
-        if mid is None:
-            mid = self.client.profile.mid
-        if postId is None:
-            raise Exception('Please provide postId')
-        if text is None:
-            raise Exception('Please provide text')
-        params = {'homeId': mid, 'sourceType': 'TIMELINE'}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/comment/create', params)
-        data = {
-            'commentText': text,
-            'postId': postId,
-            'actorId': mid
-        }
-        r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
-        return r.json()
-
-    @loggedIn
-    def deleteComment(self, mid=None, postId=None, commentId=None):
-        if mid is None:
-            mid = self.client.profile.mid
-        if postId is None:
-            raise Exception('Please provide postId')
-        if commentId is None:
-            raise Exception('Please provide commentId')
-        params = {'homeId': mid, 'sourceType': 'TIMELINE'}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/comment/delete', params)
-        data = {
-            'commentId': commentId,
-            'postId': postId,
-            'actorId': mid
-        }
-        r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
-        return r.json()
-
-    """LIKE POST"""
-
-    @loggedIn
-    def likePost(self, mid=None, postId=None, likeType=1001):
-        if mid is None:
-            mid = self.client.profile.mid
-        if postId is None:
-            raise Exception('Please provide postId')
-        if likeType not in [1001,1002,1003,1004,1005,1006]:
-            raise Exception('Invalid parameter likeType')
-        params = {'homeId': mid, 'sourceType': 'TIMELINE'}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/like/create', params)
-        data = {
-            'likeType': likeType,
-            'postId': postId,
-            'actorId': mid
-        }
-        r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
-        return r.json()
-
-    @loggedIn
-    def unlikePost(self, mid=None, postId=None):
-        if mid is None:
-            mid = self.client.profile.mid
-        if postId is None:
-            raise Exception('Please provide postId')
-        params = {'homeId': mid, 'sourceType': 'TIMELINE'}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/like/cancel', params)
-        data = {
-            'postId': postId,
-            'actorId': mid
-        }
-        r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
+            mid=self.mid
+        params = {'homeId': mid, 'commentLimit': '1', 'sourceType': 'LINE_PROFILE_COVER', 'likeLimit': '1'}
+        url = self.server.LINE_HOST_DOMAIN + '/mh/api/v27/post/list.json?' + urllib.parse.urlencode(params)
+        r = self.server.get_content(url, headers=self.server.channelHeaders)
         return r.json()
     
-    """Contact"""
-
     @loggedIn
-    def getProfileCoverURL(self, mid=None):
+    def getAlbum(self, gid):
+        url = "http://gd2.line.naver.jp/mh/album/v3/albums?type=g&sourceType=TALKROOM&homeId=" + gid
+        r = self.server.get_content(url, headers=self.server.channelHeaders)
+        return r.json()
+    
+    @loggedIn
+    def deleteAlbum(self,gid,albumId):
+        r = requests.delete(
+            "http://gd2.line.naver.jp/mh/album/v3/album/" + albumId + "?homeId=" + gid,
+            headers = self.server.channelHeaders,
+            )
+        return r.json()
+    
+    @loggedIn
+    def postNote(self, gid, text):
+        payload = {"postInfo":{"readPermission":{"homeId":gid}},
+                   "sourceType":"GROUPHOME",
+                   "contents":{"text":text}
+                   }
+        r = requests.post(
+            "http://gd2.line.naver.jp/mh/api/v27/post/create.json",
+            headers = self.server.channelHeaders,
+            data = json.dumps(payload)
+            )
+        return r.json()
+    
+    def save_image(self,filename, image):
+        with open(filename, "wb") as fout:
+            fout.write(image)
+     
+    @loggedIn
+    def getAlbumImage(self,albumId,oid,gid):
+        url = self.server.LINE_OBS_DOMAIN + "/album/a/download.nhn?ver=1.0&oid="+oid
+        h = {
+            "User-Agent" : self.server.UserAgent,
+            "X-Line-ChannelToken" : self.channelAccessToken,
+            "X-Line-Application": self.server.AppName,
+            "X-Line-Album" : albumId,
+            "X-Line-Mid" : gid,
+            "Accept-Encoding" : "gzip",
+            "Connection" : "Keep-Alive",
+        }
+        r = requests.get(url,headers = h)
+        #print(r.content)
+        print(r.text)
+        print(r.status_code)
+        self.save_image(str(oid)+".jpg",r.content)
+    
+    @loggedIn
+    def getNote(self,gid, commentLimit, likeLimit):
+        url = "http://gd2.line.naver.jp/mh/api/v27/post/list.json?homeId=" + gid + "&commentLimit=" + commentLimit + "&sourceType=TALKROOM&likeLimit=" + likeLimit
+        r = self.server.get_content(url, headers=self.server.channelHeaders)
+        return r.json()
+        
+    @loggedIn
+    def addtoAlbum(self,gid,albumId,path,oid):
+        h = {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "User-Agent" : "Line/7.5.2 iPad4,1 9.0.2",
+            "X-Line-Mid" : self.mid,
+            "X-Line-Album" : albumId,
+            "x-lct" : self.channelAccessToken
+        }
+        files = {
+            'file': open(path, 'rb'),
+        }
+        p = {
+            "userid" : self.mid,
+            "type" : "image",
+            "oid" : oid,
+            "ver" : "1.0"
+        }
+        data = {
+            'params': json.dumps(p)
+        }
+        r = self.server.post_content(url="http://obs-jp.line-apps.com:443/oa/album/a/object_info.nhn",headers=h,data=data,files=files)
+        print("CAME")
+        return r.json()
+    
+    @loggedIn
+    def getCover(self, mid):
         if mid is None:
-            mid = self.client.profile.mid
-        home = self.getProfileDetail(mid)
-        params = {'userid': mid, 'oid': home["result"]["objectId"]}
-        return self.server.urlEncode(self.server.LINE_OBS_DOMAIN, "/myhome/c/download.nhn", params)
+            mid=self.mid
+        home = self.getHome(mid)
+        objId = home["result"]["homeInfo"]["objectId"]
+        return self.server.LINE_OBS_DOMAIN + "/myhome/c/download.nhn?userid=" + mid + "&oid=" + objId
