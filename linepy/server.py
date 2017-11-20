@@ -22,9 +22,9 @@ class LineServer(object):
         'LINE_TODAY': '1518712866'
     }
 
-    USER_AGENT  = 'Line/7.5.2 iPad4,1 9.0.2'
+    USER_AGENT  = 'Line/7.14.0'
     APP_TYPE    = ApplicationType.IOS
-    APP_NAME    = 'IOSIPAD 7.5.2 iPhone OS 9.0.2'
+    APP_NAME    = 'DESKTOPMAC\t5.3.3-YOSEMITE-x64\tMAC\t10.12.0'
     PHONE_NAME  = 'IOS\t7.14.0\tiPhone OS\t10.12.0'
     CARRIER     = '51089, 1-0'
     SYSTEM_NAME = 'FDLRCN'
