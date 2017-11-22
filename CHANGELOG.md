@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ----
 
+**2017.11.21**
+* Implement sendGif
+* Implement newPost
+* Implement getNote,getAlbum  
+
+Special thanks to original LINEα
+
+
 **2017.11.18**
 
 * Fix some typo in LineModels

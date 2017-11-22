@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from .client import LineClient
 from types import *
+import json
 
 def loggedIn(func):
     def checkLogin(*args, **kwargs):
@@ -74,7 +75,30 @@ class LineChannel(object):
     def revokeChannel(self, channelId):
         return self.client.channel.revokeChannel(channelId)
         
+    """ALBUM"""
+
+    @loggedIn
+    def getAlbum(self, gid):
+        url = self.server.LINE_HOST_DOMAIN+"/mh/album/v3/albums?type=g&sourceType=TALKROOM&homeId="+gid
+        r = self.server.getContent(url, headers=self.server.channelHeaders)
+        return r.json()
+        
+    """NOTE"""
+        
+    @loggedIn
+    def getNote(self,gid, commentLimit=1, likeLimit=1):
+        url =self.server.LINE_TIMELINE_API+"/v27/post/list.json?homeId="+gid+"&commentLimit="+str(commentLimit)+"&sourceType=TALKROOM&likeLimit="+str(likeLimit)
+        r = self.server.getContent(url, headers=self.server.channelHeaders)
+        return r.json()
+        
     """TIMELINE"""
+    
+    @loggedIn
+    def newPost(self,text):
+        payload = {"postInfo" : { "readPermission" : { "type" : "ALL" } }, 'sourceType': 'TIMELINE', "contents" : { "text" : text }}
+        url = self.server.LINE_TIMELINE_API + '/v23/post/create.json'
+        r = self.server.postContent(url, data=json.dumps(payload),headers=self.server.channelHeaders)
+        return r.json()
 
     @loggedIn
     def getFeed(self, postLimit=10, commentLimit=1, likeLimit=1, order='TIME'):

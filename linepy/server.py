@@ -80,3 +80,8 @@ class LineServer(object):
         if headers is None:
             headers=self.Headers
         return self._session.get(url, headers=headers, stream=True)
+        
+    def deleteContent(self, url, data=None, files=None, headers=None):
+        if headers is None:
+            headers=self.Headers
+        return self._session.delete(url, headers=headers, data=data, files=files)

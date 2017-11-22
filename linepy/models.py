@@ -221,6 +221,36 @@ class LineModels(object):
         if r.status_code != 200:
             raise Exception('Forward object failure.')
         return True
+    
+    #Sometime fails,If send same gif multiple time.
+    #Try to use with forwardObjectMsg.
+    @loggedIn
+    def sendGif(self, to, path,name='file'):
+        import base64
+        with open(path, "rb") as f:
+            body = base64.b64encode(f.read())
+        req_bytes = base64.b64decode(body)
+        params = '{"reqseq":"0","cat":"original","range":"bytes 0-%s\/%s","oid":"reqseq","tomid":"%s","name":"%s.gif","quality":"80","ver":"1.0","type":"image"}' % (str(len(req_bytes)-1),str(len(req_bytes)),name,to)
+        head={
+            "Content-Type":"image/gif",
+            "Connection":"Keep-Alive",
+            "Accept": "*/*",
+            "User-Agent": self.server.USER_AGENT,
+            "X-Line-Access":self.authToken,
+            "X-Line-Carrier": self.server.CARRIER,
+            "x-obs-params": base64.b64encode(params.encode('utf-8')),
+            "X-Line-Application": self.server.APP_NAME,
+            "Content-Length": str(len(req_bytes))
+        }
+        r = self.server.postContent(self.server.LINE_OBS_DOMAIN + "/r/talk/m/reqseq", data=req_bytes,headers=head)
+        if r.status_code != 201:
+            raise Exception('Update failure.')
+        return True
+        
+    @loggedIn
+    def sendGifWithURL(self, to, url):
+        path = self.downloadFileURL(url, 'path')
+        return self.sendGif(to, path)
         
     @loggedIn
     def sendImage(self, to, path):
@@ -337,3 +367,75 @@ class LineModels(object):
     def sendFileWithURL(self, to, url, fileName=''):
         path = self.downloadFileURL(url, 'path')
         return self.sendFile(to, path, fileName)
+        
+    """Development"""
+    #These functions are still development. It doesn't works. if you have a working code please pull it on linepy GitHub Repo
+    
+    @loggedIn
+    def postNote(self, gid, text):
+        if len(self.server.channelHeaders) < 1:
+            raise Exception('LineChannel instance is required for acquire this action.')
+        else:
+            params = {"postInfo":{"readPermission":{"gids":gid}},"sourceType":"GROUPHOME","contents":{"text":text}}
+            #endpoint was changed?
+            r = self.server.postContent(self.server.LINE_TIMELINE_API+"/v23/post/create.json", data=json.dumps(params), headers=self.server.channelHeaders)
+            if r.status_code != 201:
+                raise Exception('Post failure.')
+            return True
+            
+    @loggedIn
+    def deleteAlbum(self,gid,albumId):
+        if len(self.server.channelHeaders) < 1:
+            raise Exception('LineChannel instance is required for acquire this action.')
+        else:
+            #endpoint was changed?
+            url = self.server.LINE_HOST_DOMAIN+"/mh/album/v3/album/"+albumId+"?homeId="+gid
+            r = self.server.deleteContent(url, headers=self.server.channelHeaders)
+            if r.status_code != 201:
+                raise Exception('DeleteAlbum failure.')
+            return True
+
+    @loggedIn
+    def changeAlbumName(self,gid,name,albumId):
+        import requests
+        payload = {
+            "title": name
+        }
+        r = requests.put(
+            #endpoint was changed?
+            self.server.LINE_HOST_DOMAIN + "/mh/album/v3/album/" + albumId + "?homeId=" + gid,
+            headers = self.server.channelHeaders,
+            data = json.dumps(payload),
+        )
+        if r.status_code != 201:
+            raise Exception('ChangeName failure.')
+        return True
+        
+    @loggedIn
+    def addImageToAlbum(self, gid, albumid, path):
+        if len(self.server.channelHeaders) < 1:
+            raise Exception('LineChannel instance is required for acquire this action.')
+        else:
+            #need to set right ObjectId to here?
+            oid = gid
+            with open(path, "rb") as f:
+                body = base64.b64encode(f.read())
+            req_bytes = base64.b64decode(body)
+            params = '{"quality":"90","ver":"1.0","type":"image","range":"bytes 0-%s\/%s","oid":"%s","name":"%s"}' % (str(len(req_bytes)-1),str(len(req_bytes)),oid, datetime.now().strftime('timeline_%Y%m%d_%H%M%S.jpg'))
+            headers={
+                "content-Type":"image/jpeg",
+                "connection":"Keep-Alive",
+                "accept": "*/*",
+                "X-Line-ChannelToken": self.server.channelHeaders['X-LCT'],
+                "X-Line-Album": str(albumid),
+                "User-Agent": self.server.USER_AGENT,
+                "x-obs-params": base64.b64encode(params.encode('utf-8')),
+                "X-Line-Carrier": self.server.CARRIER,
+                "X-Line-Application": self.server.APP_NAME,
+                "X-Line-Mid": gid,
+                "Content-Length": str(len(req_bytes))
+            }
+            r = self.server.postContent(self.server.LINE_OBS_DOMAIN + "/album/a/upload.nhn", data=data, headers=headers)
+            if r.status_code != 201:
+                raise Exception('Upload failure.')
+            return True
