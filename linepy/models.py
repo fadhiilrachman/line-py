@@ -109,9 +109,9 @@ class LineModels(object):
             }
             r_vp = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/vp/upload.nhn', data=data, files=files)
             if r_vp.status_code != 201:
-                raise Exception('Change profile video profile failure.')
+                raise Exception('Change profile video picture failure.')
             path_p = self.genTempFileName()
-            ff = FFmpeg(inputs={'%s' % path: None}, outputs={'%s' % path_p: ['-ss', '00:00:4', '-vframes', '1']})
+            ff = FFmpeg(inputs={'%s' % path: None}, outputs={'%s' % path_p: ['-ss', '00:00:2', '-vframes', '1']})
             ff.run()
             file2=open(path_p, 'rb')
             files = {
@@ -150,7 +150,7 @@ class LineModels(object):
             }
             params = {
                 'name': 'media',
-                'type': 'image/jpeg',
+                'type': 'image',
                 'oid': home["result"]["objectId"],
                 'userid': self.profile.mid,
                 'ver': '1.0',
@@ -184,7 +184,7 @@ class LineModels(object):
             raise Exception('Download file failure.')
 
     @loggedIn
-    def downloadObjectMsg(self, path, messageId, returnAs='path', saveAs=''):
+    def downloadObjectMsg(self, messageId, returnAs='path', saveAs=''):
         if saveAs == '':
             saveAs = self.genTempFileName()
         if returnAs not in ['path','bool','bin']:
