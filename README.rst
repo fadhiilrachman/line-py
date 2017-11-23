@@ -13,7 +13,7 @@ Installation
 Installation is simple. It can be installed from pip using the following
 command::
 
-    $ pip install pyqrcode
+    $ pip install linepy
 
 Or from the terminal::
 

@@ -23,15 +23,12 @@ class LinePoll(object):
         self.OpInterrupt[OperationType] = DisposeFunc
         
     def execute(self, op, threading):
-        try:
-            if threading:
-                _td = threading.Thread(target=self.OpInterrupt[op.type](op))
-                _td.daemon = False
-                _td.start()
-            else:
-                self.OpInterrupt[op.type](op)
-        except Exception as e:
-            self.client.log(str(e))
+        if threading:
+            _td = threading.Thread(target=self.OpInterrupt[op.type](op))
+            _td.daemon = False
+            _td.start()
+        else:
+            self.OpInterrupt[op.type](op)
     
     def trace(self, threading=False):
         try:

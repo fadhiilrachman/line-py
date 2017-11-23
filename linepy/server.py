@@ -6,6 +6,7 @@ class LineServer(object):
     LINE_HOST_DOMAIN            = 'https://gd2.line.naver.jp'
     LINE_OBS_DOMAIN             = 'https://obs-sg.line-apps.com'
     LINE_TIMELINE_API           = 'https://gd2.line.naver.jp/mh/api'
+    LINE_TIMELINE_MH            = 'https://gd2.line.naver.jp/mh'
 
     LINE_AUTH_QUERY_PATH        = '/api/v4/TalkService.do'
 
@@ -23,8 +24,9 @@ class LineServer(object):
     }
 
     USER_AGENT  = 'Line/7.14.0'
-    APP_TYPE    = ApplicationType.IOS
+    APP_TYPE    = ApplicationType.DESKTOPMAC
     APP_NAME    = 'DESKTOPMAC\t5.3.3-YOSEMITE-x64\tMAC\t10.12.0'
+    PHONE_TYPE  = ApplicationType.IOS
     PHONE_NAME  = 'IOS\t7.14.0\tiPhone OS\t10.12.0'
     CARRIER     = '51089, 1-0'
     SYSTEM_NAME = 'FDLRCN'
@@ -66,10 +68,16 @@ class LineServer(object):
     def setChannelHeaders(self, argument, value):
         self.channelHeaders[argument] = value
 
+    def additionalHeaders(self, source, newSource):
+        headerList={}
+        headerList.update(source)
+        headerList.update(newSource)
+        return headerList
+
     def optionsContent(self, url, data=None, files=None, headers=None):
         if headers is None:
             headers=self.Headers
-        return self._session.options(url, headers=headers, data=data, files=files)
+        return self._session.options(url, headers=headers, data=data)
 
     def postContent(self, url, data=None, files=None, headers=None):
         if headers is None:
@@ -80,3 +88,13 @@ class LineServer(object):
         if headers is None:
             headers=self.Headers
         return self._session.get(url, headers=headers, stream=True)
+
+    def deleteContent(self, url, data=None, files=None, headers=None):
+        if headers is None:
+            headers=self.Headers
+        return self._session.post(url, headers=headers, data=data)
+
+    def putContent(self, url, data=None, files=None, headers=None):
+        if headers is None:
+            headers=self.Headers
+        return self._session.put(url, headers=headers, data=data)

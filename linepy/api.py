@@ -15,8 +15,9 @@ class LineApi(object):
         self.server = LineServer()
         self.callback = LineCallback(self.defaultCallback)
         self.server.setHeadersWithDict({
+            'User-Agent': self.server.USER_AGENT,
             'X-Line-Application': self.server.APP_NAME,
-            'User-Agent': self.server.USER_AGENT
+            'X-Line-Carrier': self.server.CARRIER
         })
 
     def loadSession(self):
@@ -24,11 +25,12 @@ class LineApi(object):
         self.poll       = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_POLL_QUERY_PATH_FIR).Talk()
         self.call       = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_CALL_QUERY_PATH).Call()
         self.channel    = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_CHAN_QUERY_PATH).Channel()
+        #self.square    = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_SQUARE_QUERY_PATH).Square()
         
         self.revision = self.poll.getLastOpRevision()
         self.isLogin = True
 
-    def login(self, _id, passwd, certificate=None, systemName=None, keepLoggedIn=True):
+    def login(self, _id, passwd, certificate=None, systemName=None, phoneName=None, keepLoggedIn=True):
         if systemName is None:
             systemName=self.server.SYSTEM_NAME
         if self.server.EMAIL_REGEX.match(_id):
@@ -36,10 +38,9 @@ class LineApi(object):
         else:
             self.provider = IdentityProvider.NAVER_KR   # NAVER
         
-        self.server.setHeadersWithDict({
-            'X-Line-Application': self.server.PHONE_NAME,
-            'X-Line-Carrier': self.server.CARRIER
-        })
+        if phoneName is None:
+            phoneName=self.server.APP_NAME
+        self.server.setHeaders('X-Line-Application', phoneName)
         self._client = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_AUTH_QUERY_PATH).Talk(isopen=False)
 
         rsaKey = self._client.getRSAKeyInfo(self.provider)
@@ -87,7 +88,7 @@ class LineApi(object):
                         f.write(result.certificate)
                     self.certificate = result.certificate
                 if result.authToken is not None:
-                    self.tokenLogin(result.authToken)
+                    self.tokenLogin(result.authToken, phoneName)
                 else:
                     return False
             else:
@@ -99,11 +100,14 @@ class LineApi(object):
 
         elif result.type == LoginResultType.SUCCESS:
             self.certificate = result.certificate
-            self.tokenLogin(result.authToken)
+            self.tokenLogin(result.authToken, phoneName)
 
-    def qrLogin(self, keepLoggedIn=True, systemName=None, showQr=False):
+    def qrLogin(self, keepLoggedIn=True, systemName=None, appName=None, showQr=False):
         if systemName is None:
             systemName=self.server.SYSTEM_NAME
+        if appName is None:
+            appName=self.server.APP_NAME
+        self.server.setHeaders('X-Line-Application', appName)
 
         self._client = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_AUTH_QUERY_PATH).Talk(isopen=False)
         qrCode = self._client.getAuthQrcode(keepLoggedIn, systemName)
@@ -116,10 +120,15 @@ class LineApi(object):
 
         self.tokenLogin(result.authToken)
 
-    def tokenLogin(self, authToken=None):
+    def tokenLogin(self, authToken=None, appOrPhoneName=None):
         if authToken is None:
             raise Exception('Please provide Auth Token')
-        self.server.setHeaders('X-Line-Access', authToken)
+        if appOrPhoneName is None:
+            appOrPhoneName=self.server.APP_NAME
+        self.server.setHeadersWithDict({
+            'X-Line-Application': appOrPhoneName,
+            'X-Line-Access': authToken
+        })
         self.authToken = authToken
         self.loadSession()
 

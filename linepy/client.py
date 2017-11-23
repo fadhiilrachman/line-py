@@ -16,16 +16,20 @@ def loggedIn(func):
 
 class LineClient(LineApi, LineModels):
 
-    def __init__(self, id=None, passwd=None, authToken=None, certificate=None, systemName=None, showQr=False, keepLoggedIn=True):
+    def __init__(self, id=None, passwd=None, authToken=None, certificate=None, systemName=None, showQr=False, appName=None, phoneName=None, keepLoggedIn=True):
         
         LineApi.__init__(self)
 
         if not (authToken or id and passwd):
-            self.qrLogin(keepLoggedIn=keepLoggedIn, systemName=systemName, showQr=showQr)
+            self.qrLogin(keepLoggedIn=keepLoggedIn, systemName=systemName, appName=appName, showQr=showQr)
         if authToken:
-            self.tokenLogin(authToken=authToken)
+            if appName:
+                appOrPhoneName = appName
+            elif phoneName:
+                appOrPhoneName = phoneName
+            self.tokenLogin(authToken=authToken, appOrPhoneName=appName)
         if id and passwd:
-            self.login(_id=id, passwd=passwd, certificate=certificate, systemName=systemName, keepLoggedIn=keepLoggedIn)
+            self.login(_id=id, passwd=passwd, certificate=certificate, systemName=systemName, phoneName=phoneName, keepLoggedIn=keepLoggedIn)
 
         self._messageReq = {}
         self.profile    = self._client.getProfile()
@@ -192,6 +196,16 @@ class LineClient(LineApi, LineModels):
     @loggedIn
     def reissueUserTicket(self, expirationTime=100, maxUseCount=100):
         return self._client.reissueUserTicket(expirationTime, maxUseCount)
+    
+    @loggedIn
+    def cloneContactProfile(self, mid):
+        contact = self.getContact(mid)
+        profile = self.profile
+        profile.displayName = contact.displayName
+        profile.statusMessage = contact.statusMessage
+        profile.pictureStatus = contact.pictureStatus
+        self.updateProfileAttribute(8, profile.pictureStatus)
+        return self.updateProfile(profile)
 
     """Group"""
     
