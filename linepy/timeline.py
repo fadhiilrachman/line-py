@@ -143,12 +143,18 @@ class LineTimeline(object):
         with open(path, 'rb') as f:
             file = f.read()
         oid = int(time.time())
-        params = '{"quality":"90","ver":"1.0","type":"image","range":"bytes 0-%s\/%s","oid":"%i","name":"%s"}' % (str(len(file)-1), str(len(file)), oid, datetime.now().strftime('timeline_%Y%m%d_%H%M%S.jpg'))
+        params = {
+            'oid': oid,
+            'quality': '90',
+            'range': 'bytes 0-%s[-]%s' % (str(len(file)-1), str(len(file))),
+            'type': 'image',
+            'name': datetime.now().strftime('linepy_%Y%m%d_%H%M%S.jpg')
+        }
         hr = self.server.additionalHeaders(self.server.channelHeaders, {
             'Content-Type': 'image/jpeg',
-            'x-obs-params': base64.b64encode(params.encode('utf-8')),
             'X-Line-Mid': mid,
-            'X-Line-Album': albumId
+            'X-Line-Album': albumId,
+            'x-obs-params': self.genOBSParamsB64(params)
         })
         r = self.server.getContent(self.server.LINE_TIMELINE_API + '/album/a/upload.nhn', data=file, headers=hr)
         return r.json()
