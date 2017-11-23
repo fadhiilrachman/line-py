@@ -161,7 +161,7 @@ class LineTimeline(object):
             'X-Line-Album': albumId
         })
         params = {'ver': '1.0', 'oid': objId}
-        url = self.server.urlEncode(self.server.LINE_OBS_DOMAIN, "/myhome/c/download.nhn", params)
+        url = self.server.urlEncode(self.server.LINE_OBS_DOMAIN, "/album/a/download.nhn", params)
         r = self.server.getContent(url, headers=hr)
         return r.content
     
