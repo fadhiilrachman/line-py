@@ -186,7 +186,7 @@ class LineObject(object):
         return self.sendAudio(to, path)
 
     @loggedIn
-    def sendFile(self, to, path, file_name='media'):
+    def sendFile(self, to, path, file_name=''):
         if file_name == '':
             import ntpath
             file_name = ntpath.basename(path)
