@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-import json, time, base64
+import json, shutil, time
 
 def loggedIn(func):
     def checkLogin(*args, **kwargs):
@@ -186,7 +186,7 @@ class LineObject(object):
         return self.sendAudio(to, path)
 
     @loggedIn
-    def sendFile(self, to, path, file_name=''):
+    def sendFile(self, to, path, file_name='media'):
         if file_name == '':
             import ntpath
             file_name = ntpath.basename(path)
