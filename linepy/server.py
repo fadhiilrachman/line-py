@@ -74,7 +74,7 @@ class LineServer(object):
         headerList.update(newSource)
         return headerList
 
-    def optionsContent(self, url, data=None, files=None, headers=None):
+    def optionsContent(self, url, data=None, headers=None):
         if headers is None:
             headers=self.Headers
         return self._session.options(url, headers=headers, data=data)
@@ -89,12 +89,12 @@ class LineServer(object):
             headers=self.Headers
         return self._session.get(url, headers=headers, stream=True)
 
-    def deleteContent(self, url, data=None, files=None, headers=None):
+    def deleteContent(self, url, data=None, headers=None):
         if headers is None:
             headers=self.Headers
         return self._session.post(url, headers=headers, data=data)
 
-    def putContent(self, url, data=None, files=None, headers=None):
+    def putContent(self, url, data=None, headers=None):
         if headers is None:
             headers=self.Headers
         return self._session.put(url, headers=headers, data=data)
