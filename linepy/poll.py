@@ -29,7 +29,23 @@ class LinePoll(object):
             _td.start()
         else:
             self.OpInterrupt[op.type](op)
+
+    def singleTrace(self, count=1):
+        try:
+            operations = self.fetchOperation(self.client.revision, count=count)
+        except KeyboardInterrupt:
+            exit()
+        except:
+            return
+        
+        if operations is None:
+            self.client.log('No operation available now.')
+        else:
+            return operations
     
+    def setRevision(self, revision):
+        self.client.revision = max(revision, self.client.revision)
+
     def trace(self, threading=False):
         try:
             operations = self.fetchOperation(self.client.revision)
@@ -41,4 +57,4 @@ class LinePoll(object):
         for op in operations:
             if op.type in self.OpInterrupt.keys():
                 self.execute(op, threading)
-            self.client.revision = max(op.revision, self.client.revision)
+            self.setRevision(op.revision)

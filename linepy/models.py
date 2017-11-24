@@ -71,7 +71,7 @@ class LineModels(LineObject):
             raise Exception('Invalid parameter returnAs')
         oldList.update(newList)
         if returnAs == 'json':
-            return json.dumps({'params': oldList})
+            return json.dumps(oldList)
         elif returnAs == 'b64':
             oldList=json.dumps(oldList).replace('[-]', '\/')
             oldList=base64.b64encode(oldList.encode('utf-8'))

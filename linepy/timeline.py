@@ -120,6 +120,16 @@ class LineTimeline(object):
         return r.json()
 
     @loggedIn
+    def createGroupAlbum(self, mid, albumId, name):
+        data = json.dumps({'title': name, 'type': 'image'})
+        params = {'homeId': mid,'count': '1','auto': '0'}
+        url = self.server.urlEncode(self.server.LINE_TIMELINE_MH, '/album/v3/album/%s' % albumId, params)
+        r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
+        if r.status_code != 201:
+            raise Exception('Create a new album failure.')
+        return True
+
+    @loggedIn
     def changeAlbumName(self, mid, albumId, name):
         data = json.dumps({'title': name})
         params = {'homeId': mid}
@@ -156,7 +166,9 @@ class LineTimeline(object):
             'X-Line-Album': albumId,
             'x-obs-params': self.genOBSParamsB64(params)
         })
-        r = self.server.getContent(self.server.LINE_TIMELINE_API + '/album/a/upload.nhn', data=file, headers=hr)
+        r = self.server.getContent(self.server.LINE_OBS_DOMAIN + '/album/a/upload.nhn', data=file, headers=hr)
+        if r.status_code != 201:
+            raise Exception('Add image to album failure.')
         return r.json()
 
     @loggedIn

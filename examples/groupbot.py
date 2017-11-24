@@ -7,7 +7,6 @@ client = LineClient()
 client.log("Auth Token : " + str(client.authToken))
 
 # Initialize LineChannel with LineClient
-# This channel id is Timeline channel
 channel = LineChannel(client)
 client.log("Channel Access Token : " + str(channel.channelAccessToken))
 

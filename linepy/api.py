@@ -95,7 +95,7 @@ class LineApi(object):
                 raise Exception("Login failed")
 
         elif result.type == LoginResultType.REQUIRE_QRCODE:
-            self.qrLogin(keepLoggedIn, systemName)
+            self.qrLogin(keepLoggedIn, systemName, phoneName)
             pass
 
         elif result.type == LoginResultType.SUCCESS:
@@ -118,7 +118,7 @@ class LineApi(object):
         getAccessKey = self.server.getJson(self.server.parseUrl(self.server.LINE_CERTIFICATE_PATH), allowHeader=True)
         result = self._client.loginWithVerifierForCertificate( getAccessKey['result']['verifier'] )
 
-        self.tokenLogin(result.authToken)
+        self.tokenLogin(result.authToken, appName)
 
     def tokenLogin(self, authToken=None, appOrPhoneName=None):
         if authToken is None:

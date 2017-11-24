@@ -6,8 +6,10 @@ All notable changes to this project will be documented in this file.
 
 **2017.11.24**
 
-* Implement LineTimeline with new several function
-* Implement LineObject with merge several function from LineModals
+* Implement singleTrace() for Long polling operations
+* Add new examples: BOT for group and single trace
+* Implement LineTimeline() with new several function
+* Implement LineObject() with merge several function from LineModals
 * Now you can send GIF image with sendGIF() and sendGIFWithURL() (thanks to [Dosugamea](https://github.com/fadhiilrachman/line-py/pull/4))
 * You can add optional AppName or PhoneName from instance LineClient()
 
