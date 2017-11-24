@@ -7,7 +7,7 @@ def loggedIn(func):
         if args[0].isLogin:
             return func(*args, **kwargs)
         else:
-            args[0].callback.other("You must login to LINE")
+            args[0].callback.other('You must login to LINE')
     return checkLogin
     
 class LineTimeline(object):
@@ -190,5 +190,5 @@ class LineTimeline(object):
         if mid is None:
             mid = self.client.profile.mid
         home = self.getProfileDetail(mid)
-        params = {'userid': mid, 'oid': home["result"]["objectId"]}
-        return self.server.urlEncode(self.server.LINE_OBS_DOMAIN, "/myhome/c/download.nhn", params)
+        params = {'userid': mid, 'oid': home['result']['objectId']}
+        return self.server.urlEncode(self.server.LINE_OBS_DOMAIN, '/myhome/c/download.nhn', params)
