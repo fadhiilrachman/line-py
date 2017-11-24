@@ -7,7 +7,7 @@ def loggedIn(func):
         if args[0].isLogin:
             return func(*args, **kwargs)
         else:
-            args[0].callback.other("You must login to LINE")
+            args[0].callback.other('You must login to LINE')
     return checkLogin
     
 class LineObject(object):
@@ -57,7 +57,8 @@ class LineObject(object):
         except:
             raise Exception('You should install ffmpeg from apt and ffmpy from pypi')
 
-    # These function are still development. It doesn't works. if you have a working code please pull it on linepy GitHub Repo
+    # These function are still development. It doesn't works.
+    # If you have a working code please pull it on linepy GitHub Repo
     @loggedIn
     def updateProfileCover(self, path):
         if len(self.server.channelHeaders) < 1:
@@ -130,6 +131,7 @@ class LineObject(object):
         path = self.downloadFileURL(url, 'path')
         return self.sendImage(to, path)
 
+    @loggedIn
     def sendGIF(self, to, path):
         with open(path, 'rb') as f:
             file = f.read()
@@ -157,7 +159,7 @@ class LineObject(object):
 
     @loggedIn
     def sendVideo(self, to, path):
-        objectId = self.sendMessage(to=to, text=None, contentMetadata={'VIDLEN': '60000','DURATION' : '60000'}, contentType = 2).id
+        objectId = self.sendMessage(to=to, text=None, contentMetadata={'VIDLEN': '60000','DURATION': '60000'}, contentType = 2).id
         files = {'file': open(path, 'rb')}
         data = {'params': self.genOBSParams({'oid': objectId,'size': len(open(path, 'rb').read()),'type': 'video'})}
         r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/m/upload.nhn', data=data, files=files)
