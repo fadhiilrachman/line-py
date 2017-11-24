@@ -104,6 +104,25 @@ class LineTimeline(object):
         data = json.dumps(payload)
         r = self.server.postContent(self.server.LINE_TIMELINE_API + '/v27/post/create', data=data, headers=self.server.channelHeaders)
         return r.json()
+
+    @loggedIn
+    def createGroupAlbum(self, mid, name):
+        data = json.dumps({'title': name, 'type': 'image'})
+        params = {'homeId': mid,'count': '1','auto': '0'}
+        url = self.server.urlEncode(self.server.LINE_TIMELINE_MH, '/album/v3/album', params)
+        r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
+        if r.status_code != 201:
+            raise Exception('Create a new album failure.')
+        return True
+
+    @loggedIn
+    def deleteGroupAlbum(self, mid, albumId):
+        params = {'homeId': mid}
+        url = self.server.urlEncode(self.server.LINE_TIMELINE_MH, '/album/v3/album/%s' % albumId, params)
+        r = self.server.deleteContent(url, headers=self.server.channelHeaders)
+        if r.status_code != 201:
+            raise Exception('Delete album failure.')
+        return True
     
     @loggedIn
     def getGroupPost(self, mid, postLimit=10, commentLimit=1, likeLimit=1):
@@ -120,16 +139,6 @@ class LineTimeline(object):
         return r.json()
 
     @loggedIn
-    def createGroupAlbum(self, mid, albumId, name):
-        data = json.dumps({'title': name, 'type': 'image'})
-        params = {'homeId': mid,'count': '1','auto': '0'}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_MH, '/album/v3/album/%s' % albumId, params)
-        r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
-        if r.status_code != 201:
-            raise Exception('Create a new album failure.')
-        return True
-
-    @loggedIn
     def changeAlbumName(self, mid, albumId, name):
         data = json.dumps({'title': name})
         params = {'homeId': mid}
@@ -137,15 +146,6 @@ class LineTimeline(object):
         r = self.server.putContent(url, data=data, headers=self.server.channelHeaders)
         if r.status_code != 201:
             raise Exception('Change album name failure.')
-        return True
-
-    @loggedIn
-    def deleteAlbum(self, mid, albumId):
-        params = {'homeId': mid}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_MH, '/album/v3/album/%s' % albumId, params)
-        r = self.server.deleteContent(url, headers=self.server.channelHeaders)
-        if r.status_code != 201:
-            raise Exception('Delete album failure.')
         return True
 
     @loggedIn
@@ -179,7 +179,7 @@ class LineTimeline(object):
             'X-Line-Album': albumId
         })
         params = {'ver': '1.0', 'oid': objId}
-        url = self.server.urlEncode(self.server.LINE_OBS_DOMAIN, "/album/a/download.nhn", params)
+        url = self.server.urlEncode(self.server.LINE_OBS_DOMAIN, '/album/a/download.nhn', params)
         r = self.server.getContent(url, headers=hr)
         return r.content
     
