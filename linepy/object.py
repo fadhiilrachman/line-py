@@ -7,7 +7,7 @@ def loggedIn(func):
         if args[0].isLogin:
             return func(*args, **kwargs)
         else:
-            args[0].callback.other("You must login to LINE")
+            args[0].callback.other('You must login to LINE')
     return checkLogin
     
 class LineObject(object):
@@ -57,7 +57,8 @@ class LineObject(object):
         except:
             raise Exception('You should install FFmpeg and ffmpy from pypi')
 
-    # These function are still development. It doesn't works. if you have a working code please pull it on linepy GitHub Repo
+    # These function are still development. It doesn't works.
+    # If you have a working code please pull it on linepy GitHub Repo
     @loggedIn
     def updateProfileCover(self, path):
         if len(self.server.channelHeaders) < 1:
@@ -156,10 +157,9 @@ class LineObject(object):
 
     @loggedIn
     def sendVideo(self, to, path):
-        objectId = self.sendMessage(to=to, text=None, contentMetadata={'VIDLEN': '60000','DURATION' : '60000'}, contentType = 2).id
-        file=open(path, 'rb')
-        files = {'file': file}
-        data = {'params': self.genOBSParams({'oid': objectId,'size': len(file.read()),'type': 'video'})}
+        objectId = self.sendMessage(to=to, text=None, contentMetadata={'VIDLEN': '60000','DURATION': '60000'}, contentType = 2).id
+        files = {'file': open(path, 'rb')}
+        data = {'params': self.genOBSParams({'oid': objectId,'size': len(open(path, 'rb').read()),'type': 'video'})}
         r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/m/upload.nhn', data=data, files=files)
         if r.status_code != 201:
             raise Exception('Upload video failure.')
@@ -173,9 +173,8 @@ class LineObject(object):
     @loggedIn
     def sendAudio(self, to, path):
         objectId = self.sendMessage(to=to, text=None, contentType = 3).id
-        file=open(path, 'rb')
-        files = {'file': file}
-        data = {'params': self.genOBSParams({'oid': objectId,'size': len(file.read()),'type': 'audio'})}
+        files = {'file': open(path, 'rb')}
+        data = {'params': self.genOBSParams({'oid': objectId,'size': len(open(path, 'rb').read()),'type': 'audio'})}
         r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/m/upload.nhn', data=data, files=files)
         if r.status_code != 201:
             raise Exception('Upload audio failure.')
@@ -190,10 +189,9 @@ class LineObject(object):
     def sendFile(self, to, path, file_name=''):
         if file_name == '':
             file_name = ntpath.basename(path)
-        file=open(path, 'rb')
-        file_size = len(file.read())
+        file_size = len(open(path, 'rb').read())
         objectId = self.sendMessage(to=to, text=None, contentMetadata={'FILE_NAME': str(file_name),'FILE_SIZE': str(file_size)}, contentType = 14).id
-        files = {'file': file}
+        files = {'file': open(path, 'rb')}
         data = {'params': self.genOBSParams({'name': file_name,'oid': objectId,'size': file_size,'type': 'file'})}
         r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/m/upload.nhn', data=data, files=files)
         if r.status_code != 201:
