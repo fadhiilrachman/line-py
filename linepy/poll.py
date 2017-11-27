@@ -23,12 +23,18 @@ class LinePoll(object):
         self.OpInterrupt[OperationType] = DisposeFunc
         
     def execute(self, op, threading):
-        if threading:
-            _td = threading.Thread(target=self.OpInterrupt[op.type](op))
-            _td.daemon = False
-            _td.start()
-        else:
-            self.OpInterrupt[op.type](op)
+        try:
+            if threading:
+                _td = threading.Thread(target=self.OpInterrupt[op.type](op))
+                _td.daemon = False
+                _td.start()
+            else:
+                self.OpInterrupt[op.type](op)
+        except Exception as e:
+            self.client.log(e)
+    
+    def setRevision(self, revision):
+        self.client.revision = max(revision, self.client.revision)
 
     def singleTrace(self, count=1):
         try:
@@ -42,9 +48,6 @@ class LinePoll(object):
             self.client.log('No operation available now.')
         else:
             return operations
-    
-    def setRevision(self, revision):
-        self.client.revision = max(revision, self.client.revision)
 
     def trace(self, threading=False):
         try:

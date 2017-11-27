@@ -96,7 +96,7 @@ class LineTimeline(object):
         r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
         return r.json()
 
-    """Group"""
+    """Group Post"""
 
     @loggedIn
     def createGroupPost(self, mid, text):
@@ -111,6 +111,8 @@ class LineTimeline(object):
         url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v27/post/list', params)
         r = self.server.getContent(url, headers=self.server.channelHeaders)
         return r.json()
+
+    """Group Album"""
 
     @loggedIn
     def getGroupAlbum(self, mid):
@@ -130,7 +132,7 @@ class LineTimeline(object):
         return True
 
     @loggedIn
-    def changeAlbumName(self, mid, albumId, name):
+    def changeGroupAlbumName(self, mid, albumId, name):
         data = json.dumps({'title': name})
         params = {'homeId': mid}
         url = self.server.urlEncode(self.server.LINE_TIMELINE_MH, '/album/v3/album/%s' % albumId, params)
@@ -140,7 +142,7 @@ class LineTimeline(object):
         return True
 
     @loggedIn
-    def deleteAlbum(self, mid, albumId):
+    def deleteGroupAlbum(self, mid, albumId):
         params = {'homeId': mid}
         url = self.server.urlEncode(self.server.LINE_TIMELINE_MH, '/album/v3/album/%s' % albumId, params)
         r = self.server.deleteContent(url, headers=self.server.channelHeaders)
@@ -149,22 +151,20 @@ class LineTimeline(object):
         return True
 
     @loggedIn
-    def addImageToAlbum(self, mid, albumId, path):
+    def addImageToGroupAlbum(self, mid, albumId, path):
         with open(path, 'rb') as f:
             file = f.read()
-        oid = int(time.time())
         params = {
-            'oid': oid,
+            'oid': int(time.time()),
             'quality': '90',
             'range': 'bytes 0-%s[-]%s' % (str(len(file)-1), str(len(file))),
-            'type': 'image',
-            'name': datetime.now().strftime('linepy_%Y%m%d_%H%M%S.jpg')
+            'type': 'image'
         }
         hr = self.server.additionalHeaders(self.server.channelHeaders, {
             'Content-Type': 'image/jpeg',
             'X-Line-Mid': mid,
             'X-Line-Album': albumId,
-            'x-obs-params': self.genOBSParamsB64(params)
+            'x-obs-params': self.genOBSParams(params,'b64')
         })
         r = self.server.getContent(self.server.LINE_OBS_DOMAIN + '/album/a/upload.nhn', data=file, headers=hr)
         if r.status_code != 201:
@@ -172,16 +172,30 @@ class LineTimeline(object):
         return r.json()
 
     @loggedIn
-    def getImageAlbum(self, mid, albumId, objId):
+    def getImageGroupAlbum(self, mid, albumId, objId, returnAs='path', saveAs=''):
+        if saveAs == '':
+            saveAs = self.genTempFile('path')
+        if returnAs not in ['path','bool','bin']:
+            raise Exception('Invalid returnAs value')
         hr = self.server.additionalHeaders(self.server.channelHeaders, {
             'Content-Type': 'image/jpeg',
             'X-Line-Mid': mid,
             'X-Line-Album': albumId
         })
-        params = {'ver': '1.0', 'oid': objId}
-        url = self.server.urlEncode(self.server.LINE_OBS_DOMAIN, "/album/a/download.nhn", params)
+        params = {'ver': '1.0','oid': objId}
+        url = self.server.urlEncode(self.server.LINE_OBS_DOMAIN, '/album/a/download.nhn', params)
         r = self.server.getContent(url, headers=hr)
-        return r.content
+        if r.status_code == 200:
+            with open(saveAs, 'wb') as f:
+                shutil.copyfileobj(r.raw, f)
+            if returnAs == 'path':
+                return saveAs
+            elif returnAs == 'bool':
+                return True
+            elif returnAs == 'bin':
+                return r.raw
+        else:
+            raise Exception('Download image album failure.')
     
     """Contact"""
 
@@ -190,5 +204,5 @@ class LineTimeline(object):
         if mid is None:
             mid = self.client.profile.mid
         home = self.getProfileDetail(mid)
-        params = {'userid': mid, 'oid': home["result"]["objectId"]}
-        return self.server.urlEncode(self.server.LINE_OBS_DOMAIN, "/myhome/c/download.nhn", params)
+        params = {'userid': mid, 'oid': home['result']['objectId']}
+        return self.server.urlEncode(self.server.LINE_OBS_DOMAIN, '/myhome/c/download.nhn', params)

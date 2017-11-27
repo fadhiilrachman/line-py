@@ -33,7 +33,7 @@ class LineModels(LineObject):
         if returnAs not in ['path','bool','bin']:
             raise Exception('Invalid returnAs value')
         if saveAs == '':
-            saveAs = self.genTempFileName()
+            saveAs = self.genTempFile()
         r = self.server.getContent(fileUrl)
         if r.status_code == 200:
             with open(saveAs, 'wb') as f:
@@ -49,30 +49,27 @@ class LineModels(LineObject):
 
     """Generator"""
 
-    def genTempFileName(self):
+    def genTempFile(self, returnAs='path'):
         try:
-            return '%s/linepy-%s-%i.bin' % (tempfile.gettempdir(), int(time.time()), randint(0, 9))
+            if returnAs not in ['file','path']:
+                raise Exception('Invalid returnAs value')
+            fName, fPath = 'linepy-%s-%i.bin' % (int(time.time()), randint(0, 9)), tempfile.gettempdir()
+            if returnAs == 'file':
+                return fName
+            elif returnAs == 'path':
+                return '%s/%s' % (fPath, fName)
         except:
             raise Exception('tempfile is required')
 
     def genOBSParams(self, newList, returnAs='json'):
-        oldList = {'name': 'media','cat': 'original','ver': '1.0'}
-        if returnAs not in ['json','default']:
-            raise Exception('Invalid parameter returnAs')
-        oldList.update(newList)
-        if returnAs == 'json':
-            return json.dumps(oldList)
-        elif returnAs == 'default':
-            return oldList
-
-    def genOBSParamsB64(self, newList, returnAs='b64'):
-        oldList = {'name': 'media','cat': 'original','ver': '1.0'}
-        if returnAs not in ['b64','json']:
+        oldList = {'name': self.genTempFile('file'),'cat': 'original','ver': '1.0'}
+        if returnAs not in ['json','b64','default']:
             raise Exception('Invalid parameter returnAs')
         oldList.update(newList)
         if returnAs == 'json':
             return json.dumps(oldList)
         elif returnAs == 'b64':
             oldList=json.dumps(oldList).replace('[-]', '\/')
-            oldList=base64.b64encode(oldList.encode('utf-8'))
+            return base64.b64encode(oldList.encode('utf-8'))
+        elif returnAs == 'default':
             return oldList

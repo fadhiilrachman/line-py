@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-import json, shutil, time
+import json, shutil, time, ntpath
 
 def loggedIn(func):
     def checkLogin(*args, **kwargs):
@@ -50,12 +50,12 @@ class LineObject(object):
             r_vp = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/vp/upload.nhn', data=data, files=files)
             if r_vp.status_code != 201:
                 raise Exception('Update profile video picture failure.')
-            path_p = self.genTempFileName()
+            path_p = self.genTempFile('path')
             ff = FFmpeg(inputs={'%s' % path: None}, outputs={'%s' % path_p: ['-ss', '00:00:2', '-vframes', '1']})
             ff.run()
             self.updateProfilePicture(path_p, 'vp')
         except:
-            raise Exception('You should install ffmpeg from apt and ffmpy from pypi')
+            raise Exception('You should install FFmpeg and ffmpy from pypi')
 
     # These function are still development. It doesn't works. if you have a working code please pull it on linepy GitHub Repo
     @loggedIn
@@ -65,8 +65,7 @@ class LineObject(object):
         else:
             home = self._channel.getProfileDetail(self.profile.mid)
             oldObjId, objId = home["result"]["objectId"], int(time.time())
-            with open(path, 'rb') as f:
-                file = f.read()
+            file = open(path, 'rb').read()
             params = {
                 'userid': '%s' % self.profile.mid,
                 'oid': '%s' % str(objId),
@@ -75,7 +74,8 @@ class LineObject(object):
             }
             hr = self.server.additionalHeaders(self.server.channelHeaders, {
                 'Content-Type': 'image/jpeg',
-                'x-obs-params': self.genOBSParamsB64(params)
+                'Content-Length': str(len(file)),
+                'x-obs-params': self.genOBSParams(params,'b64')
             })
             r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/myhome/c/upload.nhn', headers=hr, data=file)
             if r.status_code != 201:
@@ -87,7 +87,7 @@ class LineObject(object):
     @loggedIn
     def downloadObjectMsg(self, messageId, returnAs='path', saveAs=''):
         if saveAs == '':
-            saveAs = self.genTempFileName()
+            saveAs = self.genTempFile('path')
         if returnAs not in ['path','bool','bin']:
             raise Exception('Invalid returnAs value')
         params = {'oid': messageId}
@@ -114,7 +114,7 @@ class LineObject(object):
         if r.status_code != 200:
             raise Exception('Forward object failure.')
         return True
-    
+
     @loggedIn
     def sendImage(self, to, path):
         objectId = self.sendMessage(to=to, text=None, contentType = 1).id
@@ -130,22 +130,21 @@ class LineObject(object):
         path = self.downloadFileURL(url, 'path')
         return self.sendImage(to, path)
 
+    @loggedIn
     def sendGIF(self, to, path):
-        with open(path, 'rb') as f:
-            file = f.read()
         params = {
             'oid': 'reqseq',
             'reqseq': '%s' % str(self.revision),
             'tomid': '%s' % str(to),
-            'size': '%s' % str(len(open(path,'rb').read())),
-            'range': 'bytes 0-%s[-]%s' % (str(len(file)-1), str(len(file))),
+            'size': '%s' % str(len(open(path, 'rb').read())),
+            'range': 'bytes 0-%s[-]%s' % (str(len(open(path, 'rb').read())-1), str(len(open(path, 'rb').read()))),
             'type': 'image'
         }
         hr = self.server.additionalHeaders(self.server.Headers, {
             'Content-Type': 'image/gif',
-            'x-obs-params': self.genOBSParamsB64(params)
+            'x-obs-params': self.genOBSParams(params,'b64')
         })
-        r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/r/talk/m/reqseq', data=file, headers=hr)
+        r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/r/talk/m/reqseq', data=open(path, 'rb').read(), headers=hr)
         if r.status_code != 201:
             raise Exception('Upload GIF failure.')
         return True
@@ -158,8 +157,9 @@ class LineObject(object):
     @loggedIn
     def sendVideo(self, to, path):
         objectId = self.sendMessage(to=to, text=None, contentMetadata={'VIDLEN': '60000','DURATION' : '60000'}, contentType = 2).id
-        files = {'file': open(path, 'rb')}
-        data = {'params': self.genOBSParams({'oid': objectId,'size': len(open(path, 'rb').read()),'type': 'video'})}
+        file=open(path, 'rb')
+        files = {'file': file}
+        data = {'params': self.genOBSParams({'oid': objectId,'size': len(file.read()),'type': 'video'})}
         r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/m/upload.nhn', data=data, files=files)
         if r.status_code != 201:
             raise Exception('Upload video failure.')
@@ -173,8 +173,9 @@ class LineObject(object):
     @loggedIn
     def sendAudio(self, to, path):
         objectId = self.sendMessage(to=to, text=None, contentType = 3).id
-        files = {'file': open(path, 'rb')}
-        data = {'params': self.genOBSParams({'oid': objectId,'size': len(open(path, 'rb').read()),'type': 'audio'})}
+        file=open(path, 'rb')
+        files = {'file': file}
+        data = {'params': self.genOBSParams({'oid': objectId,'size': len(file.read()),'type': 'audio'})}
         r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/m/upload.nhn', data=data, files=files)
         if r.status_code != 201:
             raise Exception('Upload audio failure.')
@@ -188,11 +189,11 @@ class LineObject(object):
     @loggedIn
     def sendFile(self, to, path, file_name=''):
         if file_name == '':
-            import ntpath
             file_name = ntpath.basename(path)
-        file_size = len(open(path, 'rb').read())
+        file=open(path, 'rb')
+        file_size = len(file.read())
         objectId = self.sendMessage(to=to, text=None, contentMetadata={'FILE_NAME': str(file_name),'FILE_SIZE': str(file_size)}, contentType = 14).id
-        files = {'file': open(path, 'rb')}
+        files = {'file': file}
         data = {'params': self.genOBSParams({'name': file_name,'oid': objectId,'size': file_size,'type': 'file'})}
         r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/m/upload.nhn', data=data, files=files)
         if r.status_code != 201:

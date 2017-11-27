@@ -115,8 +115,8 @@ class LineClient(LineApi, LineModels):
             name='@[list-'+str(i)+']'
             ln_text=text.replace('\n',' ')
             if ln_text.find(name):
-                line_s=int( ln_text.index(name) )
-                line_e=(int(line_s)+int( len(name) ))
+                line_s=int(ln_text.index(name))
+                line_e=(int(line_s)+int(len(name)))
             arrData={'S': str(line_s), 'E': str(line_e), 'M': mid}
             arr.append(arrData)
             i=i+1
