@@ -152,8 +152,7 @@ class LineTimeline(object):
 
     @loggedIn
     def addImageToAlbum(self, mid, albumId, path):
-        with open(path, 'rb') as f:
-            file = f.read()
+        file = open(path, 'rb').read()
         params = {
             'oid': int(time.time()),
             'quality': '90',
