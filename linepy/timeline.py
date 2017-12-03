@@ -156,7 +156,7 @@ class LineTimeline(object):
         params = {
             'oid': int(time.time()),
             'quality': '90',
-            'range': 'bytes 0-%s[-]%s' % (str(len(file)-1), str(len(file))),
+            'range': len(file),
             'type': 'image'
         }
         hr = self.server.additionalHeaders(self.server.channelHeaders, {

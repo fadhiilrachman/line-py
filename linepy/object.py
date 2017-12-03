@@ -70,7 +70,7 @@ class LineObject(object):
             params = {
                 'userid': '%s' % self.profile.mid,
                 'oid': '%s' % str(objId),
-                'range': 'bytes 0-%s[-]%s' % (str(len(file)-1), str(len(file))),
+                'range': len(file),
                 'type': 'image'
             }
             hr = self.server.additionalHeaders(self.server.channelHeaders, {
@@ -133,19 +133,20 @@ class LineObject(object):
 
     @loggedIn
     def sendGIF(self, to, path):
+        file = open(path, 'rb').read()
         params = {
             'oid': 'reqseq',
             'reqseq': '%s' % str(self.revision),
             'tomid': '%s' % str(to),
-            'size': '%s' % str(len(open(path, 'rb').read())),
-            'range': 'bytes 0-%s[-]%s' % (str(len(open(path, 'rb').read())-1), str(len(open(path, 'rb').read()))),
+            'size': '%s' % str(len(file)),
+            'range': len(file),
             'type': 'image'
         }
         hr = self.server.additionalHeaders(self.server.Headers, {
             'Content-Type': 'image/gif',
             'x-obs-params': self.genOBSParams(params,'b64')
         })
-        r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/r/talk/m/reqseq', data=open(path, 'rb').read(), headers=hr)
+        r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/r/talk/m/reqseq', data=file, headers=hr)
         if r.status_code != 201:
             raise Exception('Upload GIF failure.')
         return True

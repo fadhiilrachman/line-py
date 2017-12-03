@@ -20,7 +20,8 @@ class LineServer(object):
     CHANNEL_ID = {
         'LINE_TIMELINE': '1341209950',
         'LINE_WEBTOON': '1401600689',
-        'LINE_TODAY': '1518712866'
+        'LINE_TODAY': '1518712866',
+        'LINE_STORE': '1376922440'
     }
 
     USER_AGENT  = 'Line/7.14.0'

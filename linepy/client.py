@@ -122,7 +122,32 @@ class LineClient(LineApi, LineModels):
             i=i+1
         contentMetadata={'MENTION':str('{"MENTIONEES":' + json.dumps(arr).replace(' ','') + '}')}
         return self.sendMessage(to, text, contentMetadata)
+
+    @loggedIn
+    def sendSticker(self, to, packageId, stickerId):
+        contentMetadata = {
+            'STKVER': '100',
+            'STKPKGID': packageId,
+            'STKID': stickerId
+        }
+        return self.sendMessage(to, '', contentMetadata, 7)
         
+    @loggedIn
+    def sendContact(self, to, mid):
+        contentMetadata = {'mid': mid}
+        return self.sendMessage(to, '', contentMetadata, 13)
+
+    @loggedIn
+    def sendGift(self, productId, productType):
+        if productType not in ['theme','sticker']:
+            raise Exception('Invalid productType value')
+        contentMetadata = {
+            'MSGTPL': str(randint(0, 12)),
+            'PRDTYPE': productType.upper(),
+            'STKPKGID' if productType == 'sticker' else 'PRDID': productId
+        }
+        return self.sendMessage(to, '', contentMetadata, 9)
+
     @loggedIn
     def removeMessage(self, messageId):
         return self._client.removeMessage(messageId)

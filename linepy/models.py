@@ -62,14 +62,18 @@ class LineModels(LineObject):
             raise Exception('tempfile is required')
 
     def genOBSParams(self, newList, returnAs='json'):
-        oldList = {'name': self.genTempFile('file'),'cat': 'original','ver': '1.0'}
+        oldList = {'name': 'media','cat': 'original','ver': '1.0'}
         if returnAs not in ['json','b64','default']:
             raise Exception('Invalid parameter returnAs')
         oldList.update(newList)
+        if 'range' in oldList:
+            new_range='bytes 0-%s\/%s' % ( str(oldList['range']-1), str(oldList['range']) )
+            oldList.update({'range': new_range})
         if returnAs == 'json':
-            return json.dumps(oldList)
+            oldList=json.dumps(oldList)
+            return oldList
         elif returnAs == 'b64':
-            oldList=json.dumps(oldList).replace('[-]', '\/')
+            oldList=json.dumps(oldList)
             return base64.b64encode(oldList.encode('utf-8'))
         elif returnAs == 'default':
             return oldList

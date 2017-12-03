@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ----
 
+**2017.12.03**
+
+* Fix several bugs
+* Implement sendSticker, sendContact and sendGift in LineClient instance
+
 **2017.11.24**
 
 * Implement singleTrace() for Long polling operations
