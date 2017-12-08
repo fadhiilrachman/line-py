@@ -21,12 +21,13 @@ class LineServer(object):
         'LINE_TIMELINE': '1341209950',
         'LINE_WEBTOON': '1401600689',
         'LINE_TODAY': '1518712866',
-        'LINE_STORE': '1376922440'
+        'LINE_STORE': '1376922440',
+        'LINE_MUSIC': '1381425814'
     }
 
     USER_AGENT  = 'Line/7.14.0'
-    APP_TYPE    = ApplicationType.DESKTOPMAC
-    APP_NAME    = 'DESKTOPMAC\t5.3.3-YOSEMITE-x64\tMAC\t10.12.0'
+    APP_TYPE    = ApplicationType.IOS
+    APP_NAME    = 'IOSIPAD\t7.14.0\tiPhone OS\t10.12.0'
     PHONE_TYPE  = ApplicationType.IOS
     PHONE_NAME  = 'IOS\t7.14.0\tiPhone OS\t10.12.0'
     CARRIER     = '51089, 1-0'

@@ -45,7 +45,7 @@ class LinePoll(object):
             return
         
         if operations is None:
-            self.client.log('No operation available now.')
+            return []
         else:
             return operations
 

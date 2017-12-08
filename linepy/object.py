@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-import json, shutil, time, ntpath
+import json, time, ntpath
 
 def loggedIn(func):
     def checkLogin(*args, **kwargs):
@@ -95,8 +95,7 @@ class LineObject(object):
         url = self.server.urlEncode(self.server.LINE_OBS_DOMAIN, '/talk/m/download.nhn', params)
         r = self.server.getContent(url)
         if r.status_code == 200:
-            with open(saveAs, 'wb') as f:
-                shutil.copyfileobj(r.raw, f)
+            self.saveFile(saveAs, r.raw)
             if returnAs == 'path':
                 return saveAs
             elif returnAs == 'bool':

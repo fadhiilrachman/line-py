@@ -185,8 +185,7 @@ class LineTimeline(object):
         url = self.server.urlEncode(self.server.LINE_OBS_DOMAIN, '/album/a/download.nhn', params)
         r = self.server.getContent(url, headers=hr)
         if r.status_code == 200:
-            with open(saveAs, 'wb') as f:
-                shutil.copyfileobj(r.raw, f)
+            self.saveFile(saveAs, r.raw)
             if returnAs == 'path':
                 return saveAs
             elif returnAs == 'bool':

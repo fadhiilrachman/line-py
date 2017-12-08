@@ -22,6 +22,10 @@ class LineModels(LineObject):
 
     """File"""
 
+    def saveFile(self, path, raw):
+        with open(path, 'wb') as f:
+            shutil.copyfileobj(raw, f)
+
     def deleteFile(self, path):
         if os.path.exists(path):
             os.remove(path)
@@ -35,9 +39,8 @@ class LineModels(LineObject):
         if saveAs == '':
             saveAs = self.genTempFile()
         r = self.server.getContent(fileUrl)
-        if r.status_code == 200:
-            with open(saveAs, 'wb') as f:
-                shutil.copyfileobj(r.raw, f)
+        if r.status_code != 404:
+            self.saveFile(saveAs, r.raw)
             if returnAs == 'path':
                 return saveAs
             elif returnAs == 'bool':
@@ -57,7 +60,7 @@ class LineModels(LineObject):
             if returnAs == 'file':
                 return fName
             elif returnAs == 'path':
-                return '%s/%s' % (fPath, fName)
+                return '%s\%s' % (fPath, fName)
         except:
             raise Exception('tempfile is required')
 
