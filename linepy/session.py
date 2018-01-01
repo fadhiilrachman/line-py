@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from thrift.transport import THttpClient
 from thrift.protocol import TCompactProtocol
-from akad import TalkService, ChannelService, CallService#, SquareService
+from akad import TalkService, ChannelService, CallService, SquareService
 
 class LineSession:
 
@@ -50,9 +50,9 @@ class LineSession:
         self.transport.setCustomHeaders(self.headers)
 
         self.protocol = TCompactProtocol.TCompactProtocol(self.transport)
-        #self._square  = SquareService.Client(self.protocol)
+        self._square  = SquareService.Client(self.protocol)
         
         if isopen:
             self.transport.open()
 
-        #return self._square
+        return self._square

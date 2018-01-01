@@ -317,3 +317,25 @@ class LineClient(LineApi, LineModels):
     @loggedIn
     def acquireCallRoute(self, to):
         return self._client.acquireCallRoute(to)
+
+    """Square"""
+        
+    @loggedIn
+    def approveSquareMembers(self, squareMid, requestedMemberMids):
+        return self.square.approveSquareMembers(squareMid, requestedMemberMids)
+        
+    @loggedIn
+    def createSquareChat(self, reqSeq, squareChat, squareMemberMids):
+        return self.square.createSquareChat(reqSeq, squareChat, squareMemberMids)
+        
+    @loggedIn
+    def sendMessageSquare(self, reqSeq, squareChatMid, squareMessage):
+        return self.square.sendMessage(reqSeq, squareChatMid, squareMessage)
+        
+    @loggedIn
+    def getSquare(self, mid):
+        return self.square.getSquare(mid)
+
+    @loggedIn
+    def getJoinedSquares(self, continuationToken, limit):
+        return self.square.getJoinedSquares(continuationToken, limit)

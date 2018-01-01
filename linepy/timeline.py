@@ -21,7 +21,7 @@ class LineTimeline(object):
     @loggedIn
     def getFeed(self, postLimit=10, commentLimit=1, likeLimit=1, order='TIME'):
         params = {'postLimit': postLimit, 'commentLimit': commentLimit, 'likeLimit': likeLimit, 'order': order}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v27/feed/list', params)
+        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v27/feed/list.json', params)
         r = self.server.getContent(url, headers=self.server.channelHeaders)
         return r.json()
 
@@ -30,7 +30,7 @@ class LineTimeline(object):
         if mid is None:
             mid = self.client.profile.mid
         params = {'homeId': mid, 'postLimit': postLimit, 'commentLimit': commentLimit, 'likeLimit': likeLimit, 'sourceType': 'LINE_PROFILE_COVER'}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v27/post/list', params)
+        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v27/post/list.json', params)
         r = self.server.getContent(url, headers=self.server.channelHeaders)
         return r.json()
 
@@ -39,7 +39,7 @@ class LineTimeline(object):
         if mid is None:
             mid = self.client.profile.mid
         params = {'userMid': mid}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v1/userpopup/getDetail', params)
+        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v1/userpopup/getDetail.json', params)
         r = self.server.getContent(url, headers=self.server.channelHeaders)
         return r.json()
 
@@ -48,7 +48,7 @@ class LineTimeline(object):
     @loggedIn
     def createPost(self, text):
         params = {'homeId': mid, 'sourceType': 'TIMELINE'}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/post/create', params)
+        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/post/create.json', params)
         payload = {'postInfo': {'readPermission': {'type': 'ALL'}}, 'sourceType': 'TIMELINE', 'contents': {'text': text}}
         data = json.dumps(payload)
         r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
@@ -59,7 +59,7 @@ class LineTimeline(object):
         if mid is None:
             mid = self.client.profile.mid
         params = {'homeId': mid, 'sourceType': 'TIMELINE'}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/comment/create', params)
+        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/comment/create.json', params)
         data = {'commentText': text, 'postId': postId, 'actorId': mid}
         r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
         return r.json()
@@ -69,7 +69,7 @@ class LineTimeline(object):
         if mid is None:
             mid = self.client.profile.mid
         params = {'homeId': mid, 'sourceType': 'TIMELINE'}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/comment/delete', params)
+        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/comment/delete.json', params)
         data = {'commentId': commentId, 'postId': postId, 'actorId': mid}
         r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
         return r.json()
@@ -81,7 +81,7 @@ class LineTimeline(object):
         if likeType not in [1001,1002,1003,1004,1005,1006]:
             raise Exception('Invalid parameter likeType')
         params = {'homeId': mid, 'sourceType': 'TIMELINE'}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/like/create', params)
+        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/like/create.json', params)
         data = {'likeType': likeType, 'postId': postId, 'actorId': mid}
         r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
         return r.json()
@@ -91,7 +91,7 @@ class LineTimeline(object):
         if mid is None:
             mid = self.client.profile.mid
         params = {'homeId': mid, 'sourceType': 'TIMELINE'}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/like/cancel', params)
+        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/like/cancel.json', params)
         data = {'postId': postId, 'actorId': mid}
         r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
         return r.json()
@@ -102,14 +102,14 @@ class LineTimeline(object):
     def createGroupPost(self, mid, text):
         payload = {'postInfo': {'readPermission': {'homeId': mid}}, 'sourceType': 'TIMELINE', 'contents': {'text': text}}
         data = json.dumps(payload)
-        r = self.server.postContent(self.server.LINE_TIMELINE_API + '/v27/post/create', data=data, headers=self.server.channelHeaders)
+        r = self.server.postContent(self.server.LINE_TIMELINE_API + '/v27/post/create.json', data=data, headers=self.server.channelHeaders)
         return r.json()
 
     @loggedIn
     def createGroupAlbum(self, mid, name):
         data = json.dumps({'title': name, 'type': 'image'})
         params = {'homeId': mid,'count': '1','auto': '0'}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_MH, '/album/v3/album', params)
+        url = self.server.urlEncode(self.server.LINE_TIMELINE_MH, '/album/v3/album.json', params)
         r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
         if r.status_code != 201:
             raise Exception('Create a new album failure.')
@@ -127,7 +127,7 @@ class LineTimeline(object):
     @loggedIn
     def getGroupPost(self, mid, postLimit=10, commentLimit=1, likeLimit=1):
         params = {'homeId': mid, 'commentLimit': commentLimit, 'likeLimit': likeLimit, 'sourceType': 'TALKROOM'}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v27/post/list', params)
+        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v27/post/list.json', params)
         r = self.server.getContent(url, headers=self.server.channelHeaders)
         return r.json()
 
@@ -136,7 +136,7 @@ class LineTimeline(object):
     @loggedIn
     def getGroupAlbum(self, mid):
         params = {'homeId': mid, 'type': 'g', 'sourceType': 'TALKROOM'}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_MH, '/album/v3/albums', params)
+        url = self.server.urlEncode(self.server.LINE_TIMELINE_MH, '/album/v3/albums.json', params)
         r = self.server.getContent(url, headers=self.server.channelHeaders)
         return r.json()
 

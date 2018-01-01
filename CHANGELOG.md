@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ----
 
+**2018.01.02**
+
+* Fix login
+* Implement SquareService
+
 **2017.12.03**
 
 * Fix several bugs

@@ -8,11 +8,18 @@ class LineCallback(object):
         self.callback("Input this PIN code '" + pin + "' on your LINE for smartphone in 2 minutes")
 
     def QrUrl(self, url, showQr=True):
-        self.callback("Open this link or scan this QR on your LINE for smartphone in 2 minutes\n" + url)
         if showQr:
-            import pyqrcode
-            url = pyqrcode.create(url)
-            self.callback(url.terminal('green', 'white', 1))
+            notice='or scan this QR '
+        else:
+            notice=''
+        self.callback("Open this link " + notice + "on your LINE for smartphone in 2 minutes\n" + url)
+        if showQr:
+            try:
+                import pyqrcode
+                url = pyqrcode.create(url)
+                self.callback(url.terminal('green', 'white', 1))
+            except:
+                pass
 
     def default(self, str):
         self.callback(str)

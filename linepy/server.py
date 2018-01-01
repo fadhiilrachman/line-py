@@ -8,6 +8,7 @@ class LineServer(object):
     LINE_TIMELINE_API           = 'https://gd2.line.naver.jp/mh/api'
     LINE_TIMELINE_MH            = 'https://gd2.line.naver.jp/mh'
 
+    LINE_LOGIN_QUERY_PATH       = '/api/v4p/rs'
     LINE_AUTH_QUERY_PATH        = '/api/v4/TalkService.do'
 
     LINE_API_QUERY_PATH_FIR     = '/S4'
@@ -25,11 +26,11 @@ class LineServer(object):
         'LINE_MUSIC': '1381425814'
     }
 
-    USER_AGENT  = 'Line/7.14.0'
+    USER_AGENT  = 'Line/7.18.1'
     APP_TYPE    = ApplicationType.IOS
-    APP_NAME    = 'IOSIPAD\t7.14.0\tiPhone OS\t10.12.0'
+    APP_NAME    = 'IOSIPAD\t7.18.1\tiPhone OS\t11.2.5'
     PHONE_TYPE  = ApplicationType.IOS
-    PHONE_NAME  = 'IOS\t7.14.0\tiPhone OS\t10.12.0'
+    PHONE_NAME  = 'IOS\t7.18.1\tiPhone OS\t11.2.5'
     CARRIER     = '51089, 1-0'
     SYSTEM_NAME = 'FDLRCN'
     IP_ADDR     = '8.8.8.8'

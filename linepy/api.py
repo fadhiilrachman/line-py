@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from akad.ttypes import IdentityProvider, LoginResultType
+from akad.ttypes import IdentityProvider, LoginResultType, loginRequest
 from .server import LineServer
 from .session import LineSession
 from .callback import LineCallback
@@ -25,10 +25,30 @@ class LineApi(object):
         self.poll       = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_POLL_QUERY_PATH_FIR).Talk()
         self.call       = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_CALL_QUERY_PATH).Call()
         self.channel    = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_CHAN_QUERY_PATH).Channel()
-        #self.square    = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_SQUARE_QUERY_PATH).Square()
+        self.square     = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_SQUARE_QUERY_PATH).Square()
         
         self.revision = self.poll.getLastOpRevision()
         self.isLogin = True
+
+    def loginRequest(self, type, data):
+        lReq = loginRequest()
+        if type == '0':
+            lReq.type = 0
+            lReq.identityProvider = data.identityProvider
+            lReq.identifier = data.identifier
+            lReq.password = data.password
+            lReq.keepLoggedIn = data.keepLoggedIn
+            lReq.accessLocation = data.accessLocation
+            lReq.systemName = data.systemName
+            lReq.certificate = data.certificate
+            lReq.e2eeVersion = data.e2eeVersion
+        elif type == '1':
+            lReq.type = 1
+            lReq.verifier = data['verifier']
+            lReq.e2eeVersion = data['e2eeVersion']
+        else:
+            lReq=False
+        return lReq
 
     def login(self, _id, passwd, certificate=None, systemName=None, phoneName=None, keepLoggedIn=True):
         if systemName is None:
@@ -65,10 +85,20 @@ class LineApi(object):
                 if os.path.exists(certificate):
                     with open(certificate, 'r') as f:
                         self.certificate = f.read()
-        
-        result = self._client.loginWithIdentityCredentialForCertificate(
-            self.provider, rsaKey.keynm, crypto, keepLoggedIn, self.server.IP_ADDR, systemName, self.certificate
-        )
+
+        lReq = self.loginRequest('0', {
+            'identityProvider': self.provider,
+            'identifier': rsaKey.keynm,
+            'password': crypto,
+            'keepLoggedIn': keepLoggedIn,
+            'accessLocation': self.server.IP_ADDR,
+            'systemName': systemName,
+            'certificate': self.certificate,
+            'e2eeVersion': 1
+        })
+
+        self._client = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Talk(isopen=False)
+        result = self._client.loginZ(lReq)
         
         if result.type == LoginResultType.REQUIRE_DEVICE_CONFIRM:
             self.callback.PinVerified(result.pinCode)
@@ -76,9 +106,12 @@ class LineApi(object):
             self.server.setHeaders('X-Line-Access', result.verifier)
             getAccessKey = self.server.getJson(self.server.parseUrl(self.server.LINE_CERTIFICATE_PATH), allowHeader=True)
 
-            self._client = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_AUTH_QUERY_PATH).Talk(isopen=False)
+            lReq = self.loginRequest('1', {
+                'verifier': getAccessKey['result']['verifier'],
+                'e2eeVersion': 1
+            })
             try:
-                result = self._client.loginWithVerifierForCertificate(getAccessKey['result']['verifier'])
+                result = self._client.loginZ(lReq)
             except:
                 raise Exception("Login failed")
             
@@ -116,9 +149,25 @@ class LineApi(object):
         self.server.setHeaders('X-Line-Access', qrCode.verifier)
 
         getAccessKey = self.server.getJson(self.server.parseUrl(self.server.LINE_CERTIFICATE_PATH), allowHeader=True)
-        result = self._client.loginWithVerifierForCertificate( getAccessKey['result']['verifier'] )
+        
+        self._client = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Talk(isopen=False)
+        
+        try:
+            lReq = self.loginRequest('1', {
+                'verifier': getAccessKey['result']['verifier'],
+                'e2eeVersion': 1
+            })
+            result = self._client.loginZ(lReq)
+        except:
+            raise Exception("Login failed")
 
-        self.tokenLogin(result.authToken, appName)
+        if result.type == LoginResultType.SUCCESS:
+            if result.authToken is not None:
+                self.tokenLogin(result.authToken, appName)
+            else:
+                return False
+        else:
+            raise Exception("Login failed")
 
     def tokenLogin(self, authToken=None, appOrPhoneName=None):
         if authToken is None:
