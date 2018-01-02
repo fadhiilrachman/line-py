@@ -60,7 +60,7 @@ class LineTimeline(object):
             mid = self.client.profile.mid
         params = {'homeId': mid, 'sourceType': 'TIMELINE'}
         url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/comment/create.json', params)
-        data = {'commentText': text, 'postId': postId, 'actorId': mid}
+        data = {'commentText': text, 'activityExternalId': postId, 'actorId': mid}
         r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
         return r.json()
 
@@ -70,7 +70,7 @@ class LineTimeline(object):
             mid = self.client.profile.mid
         params = {'homeId': mid, 'sourceType': 'TIMELINE'}
         url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/comment/delete.json', params)
-        data = {'commentId': commentId, 'postId': postId, 'actorId': mid}
+        data = {'commentId': commentId, 'activityExternalId': postId, 'actorId': mid}
         r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
         return r.json()
 
@@ -82,7 +82,7 @@ class LineTimeline(object):
             raise Exception('Invalid parameter likeType')
         params = {'homeId': mid, 'sourceType': 'TIMELINE'}
         url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/like/create.json', params)
-        data = {'likeType': likeType, 'postId': postId, 'actorId': mid}
+        data = {'likeType': likeType, 'activityExternalId': postId, 'actorId': mid}
         r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
         return r.json()
 
@@ -92,7 +92,7 @@ class LineTimeline(object):
             mid = self.client.profile.mid
         params = {'homeId': mid, 'sourceType': 'TIMELINE'}
         url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v23/like/cancel.json', params)
-        data = {'postId': postId, 'actorId': mid}
+        data = {'activityExternalId': postId, 'actorId': mid}
         r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
         return r.json()
 
