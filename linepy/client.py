@@ -16,20 +16,16 @@ def loggedIn(func):
 
 class LineClient(LineApi, LineModels):
 
-    def __init__(self, id=None, passwd=None, authToken=None, certificate=None, systemName=None, showQr=False, appName=None, phoneName=None, keepLoggedIn=True):
+    def __init__(self, id=None, passwd=None, authToken=None, certificate=None, systemName=None, appName=None, showQr=False, keepLoggedIn=True):
         
         LineApi.__init__(self)
 
         if not (authToken or id and passwd):
             self.qrLogin(keepLoggedIn=keepLoggedIn, systemName=systemName, appName=appName, showQr=showQr)
         if authToken:
-            if appName:
-                appOrPhoneName = appName
-            elif phoneName:
-                appOrPhoneName = phoneName
-            self.tokenLogin(authToken=authToken, appOrPhoneName=appName)
+            self.tokenLogin(authToken=authToken, appName=appName)
         if id and passwd:
-            self.login(_id=id, passwd=passwd, certificate=certificate, systemName=systemName, phoneName=phoneName, keepLoggedIn=keepLoggedIn)
+            self.login(_id=id, passwd=passwd, certificate=certificate, systemName=systemName, appName=appName, keepLoggedIn=keepLoggedIn)
 
         self._messageReq = {}
         self.profile    = self._client.getProfile()
@@ -329,7 +325,7 @@ class LineClient(LineApi, LineModels):
         return self.square.createSquareChat(reqSeq, squareChat, squareMemberMids)
         
     @loggedIn
-    def sendMessageSquare(self, reqSeq, squareChatMid, squareMessage):
+    def sendSquareMessage(self, reqSeq, squareChatMid, squareMessage):
         return self.square.sendMessage(reqSeq, squareChatMid, squareMessage)
         
     @loggedIn

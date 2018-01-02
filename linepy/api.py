@@ -50,7 +50,7 @@ class LineApi(object):
             lReq=False
         return lReq
 
-    def login(self, _id, passwd, certificate=None, systemName=None, phoneName=None, keepLoggedIn=True):
+    def login(self, _id, passwd, certificate=None, systemName=None, appName=None, keepLoggedIn=True):
         if systemName is None:
             systemName=self.server.SYSTEM_NAME
         if self.server.EMAIL_REGEX.match(_id):
@@ -58,9 +58,9 @@ class LineApi(object):
         else:
             self.provider = IdentityProvider.NAVER_KR   # NAVER
         
-        if phoneName is None:
-            phoneName=self.server.APP_NAME
-        self.server.setHeaders('X-Line-Application', phoneName)
+        if appName is None:
+            appName=self.server.APP_NAME
+        self.server.setHeaders('X-Line-Application', appName)
         self._client = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_AUTH_QUERY_PATH).Talk(isopen=False)
 
         rsaKey = self._client.getRSAKeyInfo(self.provider)
@@ -124,19 +124,19 @@ class LineApi(object):
                         f.write(result.certificate)
                     self.certificate = result.certificate
                 if result.authToken is not None:
-                    self.tokenLogin(result.authToken, phoneName)
+                    self.tokenLogin(result.authToken, appName)
                 else:
                     return False
             else:
                 raise Exception("Login failed")
 
         elif result.type == LoginResultType.REQUIRE_QRCODE:
-            self.qrLogin(keepLoggedIn, systemName, phoneName)
+            self.qrLogin(keepLoggedIn, systemName, appName)
             pass
 
         elif result.type == LoginResultType.SUCCESS:
             self.certificate = result.certificate
-            self.tokenLogin(result.authToken, phoneName)
+            self.tokenLogin(result.authToken, appName)
 
     def qrLogin(self, keepLoggedIn=True, systemName=None, appName=None, showQr=False):
         if systemName is None:
@@ -172,13 +172,13 @@ class LineApi(object):
         else:
             raise Exception("Login failed")
 
-    def tokenLogin(self, authToken=None, appOrPhoneName=None):
+    def tokenLogin(self, authToken=None, appName=None):
         if authToken is None:
             raise Exception('Please provide Auth Token')
-        if appOrPhoneName is None:
-            appOrPhoneName=self.server.APP_NAME
+        if appName is None:
+            appName=self.server.APP_NAME
         self.server.setHeadersWithDict({
-            'X-Line-Application': appOrPhoneName,
+            'X-Line-Application': appName,
             'X-Line-Access': authToken
         })
         self.authToken = authToken
