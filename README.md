@@ -1,6 +1,6 @@
 # ![logo](/examples/assets/LINE-sm.png) LINE Python
 
- [![Version 1.9.1](https://img.shields.io/badge/stable-1.9.1-brightgreen.svg "Version 1.9.1")](https://pypi.python.org/pypi/linepy) [![LICENSE](https://img.shields.io/badge/license-BSD%203%20Clause-blue.svg "LICENSE")](https://github.com/fadhiilrachman/line-py/blob/master/LICENSE) [![Supported python versions: 2.7, 3.x](https://img.shields.io/badge/python-2.7%2C%203.x-green.svg "Supported python versions: 2.7, 3.x")](https://pypi.python.org/pypi/linepy) [![Chat on Discord](https://img.shields.io/badge/chat-on%20discord-7289da.svg "Chat on Discord")](https://discord.gg/JAA2uk6)
+ [![Version 1.9.2](https://img.shields.io/badge/stable-1.9.2-brightgreen.svg "Version 1.9.2")](https://pypi.python.org/pypi/linepy) [![LICENSE](https://img.shields.io/badge/license-BSD%203%20Clause-blue.svg "LICENSE")](https://github.com/fadhiilrachman/line-py/blob/master/LICENSE) [![Supported python versions: 2.7, 3.x](https://img.shields.io/badge/python-2.7%2C%203.x-green.svg "Supported python versions: 2.7, 3.x")](https://pypi.python.org/pypi/linepy) [![Chat on Discord](https://img.shields.io/badge/chat-on%20discord-7289da.svg "Chat on Discord")](https://discord.gg/JAA2uk6)
 
 *LINE Messaging's private API*
 
@@ -25,7 +25,7 @@ $ python setup.py install
 
 ```python
 >>> from linepy import *
->>> client = LineClient()
+>>> client = LineClient(id='EMAIL', passwd='PASSWORD')
 >>> client.log("Auth Token : " + str(client.authToken))
 ```
 

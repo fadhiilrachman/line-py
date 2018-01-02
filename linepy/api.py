@@ -34,14 +34,14 @@ class LineApi(object):
         lReq = loginRequest()
         if type == '0':
             lReq.type = 0
-            lReq.identityProvider = data.identityProvider
-            lReq.identifier = data.identifier
-            lReq.password = data.password
-            lReq.keepLoggedIn = data.keepLoggedIn
-            lReq.accessLocation = data.accessLocation
-            lReq.systemName = data.systemName
-            lReq.certificate = data.certificate
-            lReq.e2eeVersion = data.e2eeVersion
+            lReq.identityProvider = data['identityProvider']
+            lReq.identifier = data['identifier']
+            lReq.password = data['password']
+            lReq.keepLoggedIn = data['keepLoggedIn']
+            lReq.accessLocation = data['accessLocation']
+            lReq.systemName = data['systemName']
+            lReq.certificate = data['certificate']
+            lReq.e2eeVersion = data['e2eeVersion']
         elif type == '1':
             lReq.type = 1
             lReq.verifier = data['verifier']
