@@ -107,11 +107,13 @@ class LineApi(object):
             self.server.setHeaders('X-Line-Access', result.verifier)
             getAccessKey = self.server.getJson(self.server.parseUrl(self.server.LINE_CERTIFICATE_PATH), allowHeader=True)
 
-            lReq = self.loginRequest('1', {
-                'verifier': getAccessKey['result']['verifier'],
-                'e2eeVersion': 1
-            })
+            self._client = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Talk(isopen=False)
+
             try:
+                lReq = self.loginRequest('1', {
+                    'verifier': getAccessKey['result']['verifier'],
+                    'e2eeVersion': 1
+                })
                 result = self._client.loginZ(lReq)
             except:
                 raise Exception("Login failed")
