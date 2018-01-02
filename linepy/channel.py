@@ -53,7 +53,7 @@ class LineChannel(LineTimeline):
             if self.channelId == self.server.CHANNEL_ID['LINE_TIMELINE']:
                 LineTimeline.__init__(self)
                 self.profileDetail = self.getProfileDetail()
-            self.client.setChannelToModels(self)
+                self.client.setChannelToModels(self)
             self.client.log('[%s] : Success login to %s' % (self.client.profile.displayName, channelInfo.name))
 
     def approveChannelAndIssueChannelToken(self, channelId):

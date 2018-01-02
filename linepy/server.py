@@ -29,8 +29,6 @@ class LineServer(object):
     USER_AGENT  = 'Line/7.18.1'
     APP_TYPE    = ApplicationType.IOS
     APP_NAME    = 'IOSIPAD\t7.18.1\tiPhone OS\t11.2.5'
-    PHONE_TYPE  = ApplicationType.IOS
-    PHONE_NAME  = 'IOS\t7.18.1\tiPhone OS\t11.2.5'
     CARRIER     = '51089, 1-0'
     SYSTEM_NAME = 'FDLRCN'
     IP_ADDR     = '8.8.8.8'
@@ -95,7 +93,7 @@ class LineServer(object):
     def deleteContent(self, url, data=None, headers=None):
         if headers is None:
             headers=self.Headers
-        return self._session.post(url, headers=headers, data=data)
+        return self._session.delete(url, headers=headers, data=data)
 
     def putContent(self, url, data=None, headers=None):
         if headers is None:

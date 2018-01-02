@@ -86,6 +86,8 @@ class LineApi(object):
                     with open(certificate, 'r') as f:
                         self.certificate = f.read()
 
+        self._client = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Talk(isopen=False)
+
         lReq = self.loginRequest('0', {
             'identityProvider': self.provider,
             'identifier': rsaKey.keynm,
@@ -97,7 +99,6 @@ class LineApi(object):
             'e2eeVersion': 1
         })
 
-        self._client = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Talk(isopen=False)
         result = self._client.loginZ(lReq)
         
         if result.type == LoginResultType.REQUIRE_DEVICE_CONFIRM:
