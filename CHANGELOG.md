@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 **2018.01.07**
 
-* Now you can update profile cover with updateProfileCover() and updateProfileCoverById() (thanks to [fauzanardh](https://github.com/fadhiilrachman/line-py/pull/4))
+* Now you can update profile cover with updateProfileCover() and updateProfileCoverById() (thanks to [fauzanardh](https://github.com/fadhiilrachman/line-py/pull/14))
 * Fix several bugs
 * Improve LineObject and LineServer
 * Improve SquareService
