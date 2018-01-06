@@ -82,6 +82,13 @@ class LineObject(object):
             if r.status_code != 201:
                 raise Exception('Update profile cover failure.')
             return True
+        
+    @loggedIn
+    def updateCover(self, oid):
+        params = {'coverImageId': oid}
+        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v39/home/updateCover.json', params)
+        r = self.server.getContent(url, headers=self.server.channelHeaders)
+        return r.json()
 
     """Object"""
 
