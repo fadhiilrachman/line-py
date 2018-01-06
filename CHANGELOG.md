@@ -4,10 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ----
 
+**2018.01.07**
+
+* Now you can update profile cover with updateProfileCover() and updateProfileCoverById() (thanks to [fauzanardh](https://github.com/fadhiilrachman/line-py/pull/4))
+* Fix several bugs
+* Improve LineObject and LineServer
+* Improve SquareService
+
 **2018.01.02**
 
 * Fix login
 * Implement SquareService
+* Remove PhoneName arg from LineClient
 
 **2017.12.03**
 
@@ -18,10 +26,10 @@ All notable changes to this project will be documented in this file.
 
 * Implement singleTrace() for Long polling operations
 * Add new examples: BOT for group and single trace
-* Implement LineTimeline() with new several function
-* Implement LineObject() with merge several function from LineModels
+* Implement LineTimeline with new several function
+* Implement LineObject with merge several function from LineModels
 * Now you can send GIF image with sendGIF() and sendGIFWithURL() (thanks to [Dosugamea](https://github.com/fadhiilrachman/line-py/pull/4))
-* You can add optional AppName or PhoneName from instance LineClient()
+* You can add optional AppName or PhoneName from instance LineClient
 
 **2017.11.18**
 
@@ -53,7 +61,7 @@ All notable changes to this project will be documented in this file.
 
 **2017.10.23**
 
-* Improve multi login from instance LineClient()
+* Improve multi login from instance LineClient
 * QR login now showing QR ASCII from terminal with [PyQRCode](https://pypi.python.org/pypi/PyQRCode)
 * Now you can send media (image, video, audio, file) with URL
 * Implement LINE Timeline
