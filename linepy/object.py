@@ -57,33 +57,94 @@ class LineObject(object):
         except:
             raise Exception('You should install FFmpeg and ffmpy from pypi')
 
-    # These function are still development. It doesn't works.
-    # If you have a working code please pull it on linepy GitHub Repo
     @loggedIn
-    def updateProfileCover(self, path):
+    def updateProfileCover(self, path, returnAs='bool'):
         if len(self.server.channelHeaders) < 1:
             raise Exception('LineChannel instance is required for acquire this action.')
         else:
-            home = self._channel.getProfileDetail(self.profile.mid)
-            oldObjId, objId = home["result"]["objectId"], int(time.time())
+            if returnAs not in ['objId','bool']:
+                raise Exception('Invalid returnAs value')
+            objId = self.uploadObjHome(path, type='image', returnAs='objId')
+            home = self._channel.updateProfileCoverById(objId)
+            if returnAs == 'objId':
+                return objId
+            elif returnAs == 'bool':
+                return True
+
+    """Object"""
+
+    @loggedIn
+    def uploadObjTalk(self, path, type='image', returnAs='bool', objId=None, to=None):
+        if returnAs not in ['objId','bool']:
+            raise Exception('Invalid returnAs value')
+        if type not in ['image','gif','video','audio','file']:
+            raise Exception('Invalid type value')
+        headers=None
+        files = {'file': open(path, 'rb')}
+        if type == 'image' or type == 'video' or type == 'audio' or type == 'file':
+            e_p = self.server.LINE_OBS_DOMAIN + '/talk/m/upload.nhn'
+            data = {'params': self.genOBSParams({'oid': objId,'size': len(open(path, 'rb').read()),'type': type})}
+        elif type == 'gif':
+            e_p = self.server.LINE_OBS_DOMAIN + '/r/talk/m/reqseq'
+            files = None
+            data = open(path, 'rb').read()
+            params = {
+                'oid': 'reqseq',
+                'reqseq': '%s' % str(self.revision),
+                'tomid': '%s' % str(to),
+                'size': '%s' % str(len(data)),
+                'range': len(data),
+                'type': 'image'
+            }
+            headers = self.server.additionalHeaders(self.server.Headers, {
+                'Content-Type': 'image/gif',
+                'Content-Length': str(len(data)),
+                'x-obs-params': self.genOBSParams(params,'b64')
+            })
+        r = self.server.postContent(e_p, data=data, headers=headers, files=files)
+        if r.status_code != 201:
+            raise Exception('Upload %s failure.' % type)
+        if returnAs == 'objId':
+            return objId
+        elif returnAs == 'bool':
+            return True
+
+    @loggedIn
+    def uploadObjHome(self, path, type='image', returnAs='bool', objId=None):
+        if len(self.server.channelHeaders) < 1:
+            raise Exception('LineChannel instance is required for acquire this action.')
+        else:
+            if returnAs not in ['objId','bool']:
+                raise Exception('Invalid returnAs value')
+            if type not in ['image','video','audio']:
+                raise Exception('Invalid type value')
+            if type == 'image':
+                contentType = 'image/jpeg'
+            elif type == 'video':
+                contentType = 'video/mp4'
+            elif type == 'audio':
+                contentType = 'audio/mp3'
+            if not objId:
+                objId = int(time.time())
             file = open(path, 'rb').read()
             params = {
                 'userid': '%s' % self.profile.mid,
                 'oid': '%s' % str(objId),
                 'range': len(file),
-                'type': 'image'
+                'type': type
             }
             hr = self.server.additionalHeaders(self.server.channelHeaders, {
-                'Content-Type': 'image/jpeg',
+                'Content-Type': contentType,
                 'Content-Length': str(len(file)),
                 'x-obs-params': self.genOBSParams(params,'b64')
             })
             r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/myhome/c/upload.nhn', headers=hr, data=file)
             if r.status_code != 201:
-                raise Exception('Update profile cover failure.')
-            return True
-
-    """Object"""
+                raise Exception('Upload object home failure.')
+            if returnAs == 'objId':
+                return objId
+            elif returnAs == 'bool':
+                return True
 
     @loggedIn
     def downloadObjectMsg(self, messageId, returnAs='path', saveAs=''):
@@ -114,91 +175,3 @@ class LineObject(object):
         if r.status_code != 200:
             raise Exception('Forward object failure.')
         return True
-
-    @loggedIn
-    def sendImage(self, to, path):
-        objectId = self.sendMessage(to=to, text=None, contentType = 1).id
-        files = {'file': open(path, 'rb')}
-        data = {'params': self.genOBSParams({'oid': objectId,'size': len(open(path, 'rb').read()),'type': 'image'})}
-        r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/m/upload.nhn', data=data, files=files)
-        if r.status_code != 201:
-            raise Exception('Upload image failure.')
-        return True
-
-    @loggedIn
-    def sendImageWithURL(self, to, url):
-        path = self.downloadFileURL(url, 'path')
-        return self.sendImage(to, path)
-
-    @loggedIn
-    def sendGIF(self, to, path):
-        file = open(path, 'rb').read()
-        params = {
-            'oid': 'reqseq',
-            'reqseq': '%s' % str(self.revision),
-            'tomid': '%s' % str(to),
-            'size': '%s' % str(len(file)),
-            'range': len(file),
-            'type': 'image'
-        }
-        hr = self.server.additionalHeaders(self.server.Headers, {
-            'Content-Type': 'image/gif',
-            'x-obs-params': self.genOBSParams(params,'b64')
-        })
-        r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/r/talk/m/reqseq', data=file, headers=hr)
-        if r.status_code != 201:
-            raise Exception('Upload GIF failure.')
-        return True
-
-    @loggedIn
-    def sendGIFWithURL(self, to, url):
-        path = self.downloadFileURL(url, 'path')
-        return self.sendGIF(to, path)
-
-    @loggedIn
-    def sendVideo(self, to, path):
-        objectId = self.sendMessage(to=to, text=None, contentMetadata={'VIDLEN': '60000','DURATION': '60000'}, contentType = 2).id
-        files = {'file': open(path, 'rb')}
-        data = {'params': self.genOBSParams({'oid': objectId,'size': len(open(path, 'rb').read()),'type': 'video'})}
-        r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/m/upload.nhn', data=data, files=files)
-        if r.status_code != 201:
-            raise Exception('Upload video failure.')
-        return True
-
-    @loggedIn
-    def sendVideoWithURL(self, to, url):
-        path = self.downloadFileURL(url, 'path')
-        return self.sendVideo(to, path)
-
-    @loggedIn
-    def sendAudio(self, to, path):
-        objectId = self.sendMessage(to=to, text=None, contentType = 3).id
-        files = {'file': open(path, 'rb')}
-        data = {'params': self.genOBSParams({'oid': objectId,'size': len(open(path, 'rb').read()),'type': 'audio'})}
-        r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/m/upload.nhn', data=data, files=files)
-        if r.status_code != 201:
-            raise Exception('Upload audio failure.')
-        return True
-
-    @loggedIn
-    def sendAudioWithURL(self, to, url):
-        path = self.downloadFileURL(url, 'path')
-        return self.sendAudio(to, path)
-
-    @loggedIn
-    def sendFile(self, to, path, file_name=''):
-        if file_name == '':
-            file_name = ntpath.basename(path)
-        file_size = len(open(path, 'rb').read())
-        objectId = self.sendMessage(to=to, text=None, contentMetadata={'FILE_NAME': str(file_name),'FILE_SIZE': str(file_size)}, contentType = 14).id
-        files = {'file': open(path, 'rb')}
-        data = {'params': self.genOBSParams({'name': file_name,'oid': objectId,'size': file_size,'type': 'file'})}
-        r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/m/upload.nhn', data=data, files=files)
-        if r.status_code != 201:
-            raise Exception('Upload file failure.')
-        return True
-
-    @loggedIn
-    def sendFileWithURL(self, to, url, fileName=''):
-        path = self.downloadFileURL(url, 'path')
-        return self.sendFile(to, path, fileName)

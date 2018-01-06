@@ -96,7 +96,7 @@ class LineApi(object):
             'accessLocation': self.server.IP_ADDR,
             'systemName': systemName,
             'certificate': self.certificate,
-            'e2eeVersion': 1
+            'e2eeVersion': 0
         })
 
         result = self._client.loginZ(lReq)
@@ -112,7 +112,7 @@ class LineApi(object):
             try:
                 lReq = self.loginRequest('1', {
                     'verifier': getAccessKey['result']['verifier'],
-                    'e2eeVersion': 1
+                    'e2eeVersion': 0
                 })
                 result = self._client.loginZ(lReq)
             except:
@@ -158,7 +158,7 @@ class LineApi(object):
         try:
             lReq = self.loginRequest('1', {
                 'verifier': getAccessKey['result']['verifier'],
-                'e2eeVersion': 1
+                'e2eeVersion': 0
             })
             result = self._client.loginZ(lReq)
         except:

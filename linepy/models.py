@@ -33,12 +33,12 @@ class LineModels(LineObject):
         else:
             return False
 
-    def downloadFileURL(self, fileUrl, returnAs='path', saveAs=''):
+    def downloadFileURL(self, fileUrl, returnAs='path', saveAs='', headers=None):
         if returnAs not in ['path','bool','bin']:
             raise Exception('Invalid returnAs value')
         if saveAs == '':
             saveAs = self.genTempFile()
-        r = self.server.getContent(fileUrl)
+        r = self.server.getContent(fileUrl, headers=headers)
         if r.status_code != 404:
             self.saveFile(saveAs, r.raw)
             if returnAs == 'path':
@@ -60,7 +60,7 @@ class LineModels(LineObject):
             if returnAs == 'file':
                 return fName
             elif returnAs == 'path':
-                return '%s\%s' % (fPath, fName)
+                return os.path.join(fPath, fName)
         except:
             raise Exception('tempfile is required')
 

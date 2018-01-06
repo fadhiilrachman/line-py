@@ -26,11 +26,11 @@ class LineServer(object):
         'LINE_MUSIC': '1381425814'
     }
 
-    USER_AGENT  = 'Line/7.18.1'
-    APP_TYPE    = ApplicationType.IOS
-    APP_NAME    = 'IOSIPAD\t7.18.1\tiPhone OS\t11.2.5'
+    APP_TYPE    = ApplicationType._VALUES_TO_NAMES[304]
+    APP_VER     = '7.18.1'
     CARRIER     = '51089, 1-0'
     SYSTEM_NAME = 'FDLRCN'
+    SYSTEM_VER  = '11.2.5'
     IP_ADDR     = '8.8.8.8'
     EMAIL_REGEX = re.compile(r"[^@]+@[^@]+\.[^@]+")
 
@@ -41,6 +41,8 @@ class LineServer(object):
     def __init__(self):
         self.Headers = {}
         self.channelHeaders = {}
+        self.APP_NAME = '%s\t%s\t%s\t%s' % (self.APP_TYPE, self.APP_VER, self.SYSTEM_NAME, self.SYSTEM_VER)
+        self.USER_AGENT = 'Line/%s' % self.APP_VER
 
     def parseUrl(self, path):
         return self.LINE_HOST_DOMAIN + path

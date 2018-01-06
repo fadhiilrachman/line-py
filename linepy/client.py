@@ -16,10 +16,13 @@ def loggedIn(func):
 
 class LineClient(LineApi, LineModels):
 
-    def __init__(self, id=None, passwd=None, authToken=None, certificate=None, systemName=None, appName=None, showQr=False, keepLoggedIn=True):
+    customThrift = None
+
+    def __init__(self, id=None, passwd=None, authToken=None, certificate=None, systemName=None, appName=None, showQr=False, keepLoggedIn=True, customThrift=None):
         
         LineApi.__init__(self)
-
+        if customThrift:
+            self.customThrift = customThrift
         if not (authToken or id and passwd):
             self.qrLogin(keepLoggedIn=keepLoggedIn, systemName=systemName, appName=appName, showQr=showQr)
         if authToken:
@@ -163,6 +166,60 @@ class LineClient(LineApi, LineModels):
     @loggedIn
     def getLastReadMessageIds(self, chatId):
         return self._client.getLastReadMessageIds(0,chatId)
+
+    """Object"""
+
+    @loggedIn
+    def sendImage(self, to, path):
+        objectId = self.sendMessage(to=to, text=None, contentType = 1).id
+        return self.uploadObjTalk(path=path, type='image', returnAs='bool', objId=objectId)
+
+    @loggedIn
+    def sendImageWithURL(self, to, url):
+        path = self.downloadFileURL(url, 'path')
+        return self.sendImage(to, path)
+
+    @loggedIn
+    def sendGIF(self, to, path):
+        return self.uploadObjTalk(path=path, type='gif', returnAs='bool', to=to)
+
+    @loggedIn
+    def sendGIFWithURL(self, to, url):
+        path = self.downloadFileURL(url, 'path')
+        return self.sendGIF(to, path)
+
+    @loggedIn
+    def sendVideo(self, to, path):
+        objectId = self.sendMessage(to=to, text=None, contentMetadata={'VIDLEN': '60000','DURATION': '60000'}, contentType = 2).id
+        return self.uploadObjTalk(path=path, type='video', returnAs='bool', objId=objectId)
+
+    @loggedIn
+    def sendVideoWithURL(self, to, url):
+        path = self.downloadFileURL(url, 'path')
+        return self.sendVideo(to, path)
+
+    @loggedIn
+    def sendAudio(self, to, path):
+        objectId = self.sendMessage(to=to, text=None, contentType = 3).id
+        return self.uploadObjTalk(path=path, type='audio', returnAs='bool', objId=objectId)
+
+    @loggedIn
+    def sendAudioWithURL(self, to, url):
+        path = self.downloadFileURL(url, 'path')
+        return self.sendAudio(to, path)
+
+    @loggedIn
+    def sendFile(self, to, path, file_name=''):
+        if file_name == '':
+            file_name = ntpath.basename(path)
+        file_size = len(open(path, 'rb').read())
+        objectId = self.sendMessage(to=to, text=None, contentMetadata={'FILE_NAME': str(file_name),'FILE_SIZE': str(file_size)}, contentType = 14).id
+        return self.uploadObjTalk(path=path, type='file', returnAs='bool', objId=objectId)
+
+    @loggedIn
+    def sendFileWithURL(self, to, url, fileName=''):
+        path = self.downloadFileURL(url, 'path')
+        return self.sendFile(to, path, fileName)
 
     """Contact"""
         
@@ -317,20 +374,40 @@ class LineClient(LineApi, LineModels):
     """Square"""
         
     @loggedIn
-    def approveSquareMembers(self, squareMid, requestedMemberMids):
-        return self.square.approveSquareMembers(squareMid, requestedMemberMids)
+    def findSquareByInvitationTicket(self, request):
+        return self.square.findSquareByInvitationTicket(request)
         
     @loggedIn
-    def createSquareChat(self, reqSeq, squareChat, squareMemberMids):
-        return self.square.createSquareChat(reqSeq, squareChat, squareMemberMids)
+    def approveSquareMembers(self, request):
+        return self.square.approveSquareMembers(request)
         
     @loggedIn
-    def sendSquareMessage(self, reqSeq, squareChatMid, squareMessage):
-        return self.square.sendMessage(reqSeq, squareChatMid, squareMessage)
+    def destroyMessage(self, request):
+        return self.square.destroyMessage(request)
+        
+    @loggedIn
+    def deleteSquare(self, request):
+        return self.square.deleteSquare(request)
+
+    @loggedIn
+    def deleteSquareChat(self, request):
+        return self.square.deleteSquareChat(request)
+        
+    @loggedIn
+    def createSquare(self, request):
+        return self.square.createSquare(request)
+        
+    @loggedIn
+    def createSquareChat(self, request):
+        return self.square.createSquareChat(request)
         
     @loggedIn
     def getSquare(self, mid):
         return self.square.getSquare(mid)
+        
+    @loggedIn
+    def sendSquareMessage(self, reqSeq, squareChatMid, squareMessage):
+        return self.square.sendMessage(reqSeq, squareChatMid, squareMessage)
 
     @loggedIn
     def getJoinedSquares(self, continuationToken, limit):
