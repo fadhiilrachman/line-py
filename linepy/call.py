@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-from .client import LineClient
 from akad.ttypes import MediaType
-from types import *
 
 def loggedIn(func):
     def checkLogin(*args, **kwargs):
@@ -13,21 +11,22 @@ def loggedIn(func):
     
 class LineCall(object):
     isLogin = False
-    client  = None
 
-    def __init__(self, client):
-        if type(client) is not LineClient:
-            raise Exception("You need to set LineClient instance to initialize LineCall")
-        self.client = client
+    def __init__(self):
+        self.isLogin = True
         
+    @loggedIn
     def acquireCallRoute(self, to):
-        return self.client.call.acquireCallRoute(to)
+        return self.call.acquireCallRoute(to)
         
+    @loggedIn
     def acquireGroupCallRoute(self, groupId, mediaType=MediaType.AUDIO):
-        return self.client.call.acquireGroupCallRoute(groupId, mediaType)
+        return self.call.acquireGroupCallRoute(groupId, mediaType)
 
+    @loggedIn
     def getGroupCall(self, ChatMid):
-        return self.client.call.getGroupCall(ChatMid)
+        return self.call.getGroupCall(ChatMid)
         
+    @loggedIn
     def inviteIntoGroupCall(self, chatId, contactIds=[], mediaType=MediaType.AUDIO):
-        return self.client.call.inviteIntoGroupCall(chatId, contactIds, mediaType)
+        return self.call.inviteIntoGroupCall(chatId, contactIds, mediaType)

@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-from akad.ttypes import IdentityProvider, LoginResultType, loginRequest
+from akad.ttypes import IdentityProvider, LoginResultType, LoginRequest, LoginType
 from .server import LineServer
 from .session import LineSession
-from .callback import LineCallback
+from .callback import Callback
 
 import rsa, os
 
-class LineApi(object):
+class LineAuth(object):
     isLogin     = False
     authToken   = ""
     certificate = ""
 
     def __init__(self):
         self.server = LineServer()
-        self.callback = LineCallback(self.defaultCallback)
+        self.callback = Callback(self.defaultCallback)
         self.server.setHeadersWithDict({
             'User-Agent': self.server.USER_AGENT,
             'X-Line-Application': self.server.APP_NAME,
@@ -21,7 +21,7 @@ class LineApi(object):
         })
 
     def loadSession(self):
-        self._client    = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_API_QUERY_PATH_FIR).Talk()
+        self.talk       = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_API_QUERY_PATH_FIR).Talk()
         self.poll       = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_POLL_QUERY_PATH_FIR).Talk()
         self.call       = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_CALL_QUERY_PATH).Call()
         self.channel    = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_CHAN_QUERY_PATH).Channel()
@@ -31,9 +31,9 @@ class LineApi(object):
         self.isLogin = True
 
     def loginRequest(self, type, data):
-        lReq = loginRequest()
+        lReq = LoginRequest()
         if type == '0':
-            lReq.type = 0
+            lReq.type = LoginType.ID_CREDENTIAL
             lReq.identityProvider = data['identityProvider']
             lReq.identifier = data['identifier']
             lReq.password = data['password']
@@ -43,7 +43,14 @@ class LineApi(object):
             lReq.certificate = data['certificate']
             lReq.e2eeVersion = data['e2eeVersion']
         elif type == '1':
-            lReq.type = 1
+            lReq.type = LoginType.QRCODE
+            lReq.keepLoggedIn = data['keepLoggedIn']
+            if data['identityProvider']:
+                lReq.identityProvider = data['identityProvider']
+            if data['accessLocation']:
+                lReq.accessLocation = data['accessLocation']
+            if data['systemName']:
+                lReq.systemName = data['systemName']
             lReq.verifier = data['verifier']
             lReq.e2eeVersion = data['e2eeVersion']
         else:
@@ -61,9 +68,9 @@ class LineApi(object):
         if appName is None:
             appName=self.server.APP_NAME
         self.server.setHeaders('X-Line-Application', appName)
-        self._client = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_AUTH_QUERY_PATH).Talk(isopen=False)
+        self.tauth = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_AUTH_QUERY_PATH).Talk(isopen=False)
 
-        rsaKey = self._client.getRSAKeyInfo(self.provider)
+        rsaKey = self.tauth.getRSAKeyInfo(self.provider)
         
         message = (chr(len(rsaKey.sessionKey)) + rsaKey.sessionKey +
                    chr(len(_id)) + _id +
@@ -86,7 +93,7 @@ class LineApi(object):
                     with open(certificate, 'r') as f:
                         self.certificate = f.read()
 
-        self._client = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Talk(isopen=False)
+        self.auth = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Auth(isopen=False)
 
         lReq = self.loginRequest('0', {
             'identityProvider': self.provider,
@@ -99,7 +106,7 @@ class LineApi(object):
             'e2eeVersion': 0
         })
 
-        result = self._client.loginZ(lReq)
+        result = self.auth.loginZ(lReq)
         
         if result.type == LoginResultType.REQUIRE_DEVICE_CONFIRM:
             self.callback.PinVerified(result.pinCode)
@@ -107,14 +114,15 @@ class LineApi(object):
             self.server.setHeaders('X-Line-Access', result.verifier)
             getAccessKey = self.server.getJson(self.server.parseUrl(self.server.LINE_CERTIFICATE_PATH), allowHeader=True)
 
-            self._client = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Talk(isopen=False)
+            self.auth = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Auth(isopen=False)
 
             try:
                 lReq = self.loginRequest('1', {
+                    'keepLoggedIn': keepLoggedIn,
                     'verifier': getAccessKey['result']['verifier'],
                     'e2eeVersion': 0
                 })
-                result = self._client.loginZ(lReq)
+                result = self.auth.loginZ(lReq)
             except:
                 raise Exception("Login failed")
             
@@ -145,22 +153,26 @@ class LineApi(object):
             appName=self.server.APP_NAME
         self.server.setHeaders('X-Line-Application', appName)
 
-        self._client = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_AUTH_QUERY_PATH).Talk(isopen=False)
-        qrCode = self._client.getAuthQrcode(keepLoggedIn, systemName)
+        self.tauth = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_AUTH_QUERY_PATH).Talk(isopen=False)
+        qrCode = self.tauth.getAuthQrcode(keepLoggedIn, systemName)
 
         self.callback.QrUrl("line://au/q/" + qrCode.verifier, showQr)
         self.server.setHeaders('X-Line-Access', qrCode.verifier)
 
         getAccessKey = self.server.getJson(self.server.parseUrl(self.server.LINE_CERTIFICATE_PATH), allowHeader=True)
         
-        self._client = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Talk(isopen=False)
+        self.auth = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Auth(isopen=False)
         
         try:
             lReq = self.loginRequest('1', {
+                'keepLoggedIn': keepLoggedIn,
+                'systemName': systemName,
+                'identityProvider': IdentityProvider.LINE,
                 'verifier': getAccessKey['result']['verifier'],
+                'accessLocation': self.server.IP_ADDR,
                 'e2eeVersion': 0
             })
-            result = self._client.loginZ(lReq)
+            result = self.auth.loginZ(lReq)
         except:
             raise Exception("Login failed")
 
@@ -188,4 +200,4 @@ class LineApi(object):
         print(str)
 
     def logout(self):
-        self._client.logoutSession(self.authToken)
+        self.auth.logoutZ()

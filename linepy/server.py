@@ -23,10 +23,11 @@ class LineServer(object):
         'LINE_WEBTOON': '1401600689',
         'LINE_TODAY': '1518712866',
         'LINE_STORE': '1376922440',
-        'LINE_MUSIC': '1381425814'
+        'LINE_MUSIC': '1381425814',
+        'LINE_BUSINESS': '1459630796'
     }
 
-    APP_TYPE    = ApplicationType._VALUES_TO_NAMES[304]
+    APP_TYPE    = ApplicationType._VALUES_TO_NAMES[96]
     APP_VER     = '7.18.1'
     CARRIER     = '51089, 1-0'
     SYSTEM_NAME = 'FDLRCN'

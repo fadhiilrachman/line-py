@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ----
 
+**2018.01.13**
+
+* Updated to version 2.0.0
+* Implement LineAuth, LineTalk and LineSquare
+* Merge LineTalk, LineCall and LineSquare into LineClient
+* Delete LineApi, rename as LineAuth
+
 **2018.01.02**
 
 * Fix login

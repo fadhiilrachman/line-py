@@ -7,7 +7,7 @@ def loggedIn(func):
         if args[0].isLogin:
             return func(*args, **kwargs)
         else:
-            args[0].callback.other('You must login to LINE')
+            args[0].callback.other("You want to call the function, you must login to LINE")
     return checkLogin
     
 class LineObject(object):
