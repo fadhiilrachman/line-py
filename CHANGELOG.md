@@ -4,21 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ----
 
-<<<<<<< HEAD
 **2018.01.13**
 
 * Updated to version 2.0.0
 * Implement LineAuth, LineTalk and LineSquare
 * Merge LineTalk, LineCall and LineSquare into LineClient
 * Delete LineApi, rename as LineAuth
-=======
+
 **2018.01.07**
 
 * Now you can update profile cover with updateProfileCover() and updateProfileCoverById() (thanks to [fauzanardh](https://github.com/fadhiilrachman/line-py/pull/14))
 * Fix several bugs
 * Improve LineObject and LineServer
 * Improve SquareService
->>>>>>> b884a4fff17c828a5bdb152514cc5d5ac27a0b5a
 
 **2018.01.02**
 
