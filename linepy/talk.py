@@ -130,6 +130,18 @@ class LineTalk(object):
         return self.sendMessage(to, '', contentMetadata, 9)
 
     @loggedIn
+    def unsendMessage(self, seq, messageId):
+        return self.talk.unsendMessage(seq, messageId)
+
+    @loggedIn
+    def requestResendMessage(self, reqSeq, senderMid, messageId):
+        return self.talk.requestResendMessage(reqSeq, senderMid, messageId)
+
+    @loggedIn
+    def respondResendMessage(self, reqSeq, receiverMid, originalMessageId, resendMessage, errorCode):
+        return self.talk.respondResendMessage(reqSeq, receiverMid, originalMessageId, resendMessage, errorCode)
+
+    @loggedIn
     def removeMessage(self, messageId):
         return self.talk.removeMessage(messageId)
         
@@ -268,6 +280,26 @@ class LineTalk(object):
         return self.updateProfile(profile)
 
     """Group"""
+
+    @loggedIn
+    def getChatRoomAnnouncementsBulk(self, chatRoomMids):
+        return self.talk.getChatRoomAnnouncementsBulk(chatRoomMids)
+
+    @loggedIn
+    def getChatRoomAnnouncements(self, chatRoomMid):
+        return self.talk.getChatRoomAnnouncements(chatRoomMid)
+
+    @loggedIn
+    def createChatRoomAnnouncement(self, reqSeq, chatRoomMid, type, contents):
+        return self.talk.createChatRoomAnnouncement(reqSeq, chatRoomMid, type, contents)
+
+    @loggedIn
+    def removeChatRoomAnnouncement(self, reqSeq, chatRoomMid, announcementSeq):
+        return self.talk.removeChatRoomAnnouncement(reqSeq, chatRoomMid, announcementSeq)
+
+    @loggedIn
+    def getGroupWithoutMembers(self, groupId):
+        return self.talk.getGroupWithoutMembers(groupId)
     
     @loggedIn
     def findGroupByTicket(self, ticketId):

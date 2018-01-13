@@ -84,6 +84,16 @@ class LineSquare(object):
         return self.square.createSquareChat(request)
         
     @loggedIn
+    def fetchSquareChatEvents(self, squareChatMid, syncToken, limit=50, direction=2):
+        rq = FetchSquareChatEventsRequest()
+        rq.subscriptionId = subscriptionId
+        rq.squareChatMid = squareChatMid
+        rq.syncToken = syncToken
+        rq.limit = limit
+        rq.direction = direction
+        return self.square.fetchSquareChatEvents(rq)
+        
+    @loggedIn
     def getSquare(self, mid):
         return self.square.getSquare(mid)
         
