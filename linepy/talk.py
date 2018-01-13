@@ -327,6 +327,10 @@ class LineTalk(object):
     @loggedIn
     def getGroup(self, groupId):
         return self.talk.getGroup(groupId)
+    
+    @loggedIn
+    def getCompactGroup(self, groupId):
+        return self.talk.getCompactGroup(groupId)
 
     @loggedIn
     def getGroups(self, groupIds):
@@ -339,6 +343,16 @@ class LineTalk(object):
     @loggedIn
     def getGroupIdsJoined(self):
         return self.talk.getGroupIdsJoined()
+    
+    @loggedIn
+    def getGroupByName(self, groupName):
+        gids = []
+        jids = self.getGroupIdsJoined()
+        for gid in jids:
+            gr = self.getCompactGroup(gid)
+            if groupName in gr.name:
+                gids.append(gid)
+        return gids
 
     @loggedIn
     def inviteIntoGroup(self, groupId, midlist):
@@ -363,6 +377,10 @@ class LineTalk(object):
     @loggedIn
     def updateGroup(self, groupObject):
         return self.talk.updateGroup(0, groupObject)
+    
+    @loggedIn    
+    def updateGroupPreferenceAttribute(self, groupMid, updatedAttrs):
+        return self.talk.updateGroupPreferenceAttribute(0, groupMid, updatedAttrs)
 
     """Room"""
 
@@ -373,6 +391,10 @@ class LineTalk(object):
     @loggedIn
     def getRoom(self, roomId):
         return self.talk.getRoom(roomId)
+    
+    @loggedIn
+    def getCompactRoom(self, roomId):
+        return self.talk.getCompactRoom(roomId)
 
     @loggedIn
     def inviteIntoRoom(self, roomId, midlist):
