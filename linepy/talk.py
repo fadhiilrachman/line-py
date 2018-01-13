@@ -345,7 +345,7 @@ class LineTalk(object):
         return self.talk.getGroupIdsJoined()
     
     @loggedIn
-    def getGroupByName(self, groupName):
+    def getGroupIdsByName(self, groupName):
         gids = []
         jids = self.getGroupIdsJoined()
         for gid in jids:
