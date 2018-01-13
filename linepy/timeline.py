@@ -53,9 +53,8 @@ class LineTimeline(object):
     """Post"""
 
     @loggedIn
-    def createPost(self, text, holdingTime=None):
-        params = {'homeId': mid, 'sourceType': 'TIMELINE'}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v33/post/create.json', params)
+    def createPost(self,text, holdingTime=None):
+        url = self.server.LINE_TIMELINE_API + '/v33/post/create.json'
         payload = {'postInfo': {'readPermission': {'type': 'ALL'}}, 'sourceType': 'TIMELINE', 'contents': {'text': text}}
         if holdingTime != None:
             payload["postInfo"]["holdingTime"] = holdingTime
