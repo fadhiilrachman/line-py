@@ -84,7 +84,7 @@ class LineSquare(object):
         return self.square.createSquareChat(request)
         
     @loggedIn
-    def fetchSquareChatEvents(self, squareChatMid, syncToken, limit=50, direction=2):
+    def fetchSquareChatEvents(self, subscriptionId, squareChatMid, syncToken=None, limit=50, direction=2):
         rq = FetchSquareChatEventsRequest()
         rq.subscriptionId = subscriptionId
         rq.squareChatMid = squareChatMid
@@ -92,6 +92,120 @@ class LineSquare(object):
         rq.limit = limit
         rq.direction = direction
         return self.square.fetchSquareChatEvents(rq)
+        
+    @loggedIn
+    def fetchMyEvents(self, subscriptionId, syncToken=None, continuationToken=None, limit=50):
+        rq = FetchMyEventsRequest()
+        rq.subscriptionId = subscriptionId
+        rq.syncToken = syncToken
+        rq.continuationToken = continuationToken
+        rq.limit = limit
+        return self.square.fetchMyEvents(rq)
+        
+    @loggedIn
+    def markAsRead(self, squareChatMid, messageId):
+        rq = MarkAsReadRequest()
+        rq.squareChatMid = squareChatMid
+        rq.messageId = messageId
+        return self.square.markAsRead(rq)
+        
+    @loggedIn
+    def getSquareAuthority(self, squareMid):
+        rq = GetSquareAuthorityRequest()
+        rq.squareMid = squareMid
+        return self.square.getSquareAuthority(rq)
+
+    @loggedIn
+    def leaveSquare(self, squareMid):
+        rq = LeaveSquareRequest()
+        rq.squareMid = squareMid
+        return self.square.leaveSquare(rq)
+
+    @loggedIn
+    def leaveSquareChat(self, squareChatMid, squareChatMemberRevision, sayGoodbye=False):
+        rq = LeaveSquareChatRequest()
+        rq.squareChatMid = squareChatMid
+        rq.sayGoodbye = sayGoodbye
+        rq.squareChatMemberRevision = squareChatMemberRevision
+        return self.square.leaveSquareChat(rq)
+        
+    @loggedIn
+    def joinSquareChat(self, squareChatMid):
+        rq = JoinSquareChatRequest()
+        rq.squareChatMid = squareChatMid
+        return self.square.joinSquareChat(rq)
+        
+    @loggedIn
+    def joinSquare(self, squareMid, displayName, profileImageObsHash):
+        rq = JoinSquareRequest()
+        rq.squareMid = squareMid
+        rq.member = SquareMember()
+        rq.member.squareMid = squareMid
+        rq.member.displayName = displayName
+        rq.member.profileImageObsHash = profileImageObsHash
+        return self.square.joinSquareChat(rq)
+        
+    @loggedIn
+    def inviteToSquare(self, squareMid, squareChatMid, invitees=[]):
+        rq = InviteToSquareRequest()
+        rq.squareMid = squareMid
+        rq.invitees = invitees
+        rq.squareChatMid = squareChatMid
+        return self.square.inviteToSquare(rq)
+        
+    @loggedIn
+    def inviteToSquareChat(self, squareChatMid, inviteeMids=[]):
+        rq = InviteToSquareChatRequest()
+        rq.inviteeMids = inviteeMids
+        rq.squareChatMid = squareChatMid
+        return self.square.inviteToSquareChat(rq)
+        
+    @loggedIn
+    def getSquareMember(self, squareMemberMid):
+        rq = GetSquareMemberRequest()
+        rq.squareMemberMid = squareMemberMid
+        return self.square.getSquareMember(rq)
+        
+    @loggedIn
+    def getSquareMembers(self, mids=[]):
+        rq = GetSquareMembersRequest()
+        rq.mids = mids
+        return self.square.getSquareMembers(rq)
+        
+    @loggedIn
+    def getSquareMemberRelation(self, squareMid, targetSquareMemberMid):
+        rq = GetSquareMemberRelationRequest()
+        rq.squareMid = squareMid
+        rq.targetSquareMemberMid = targetSquareMemberMid
+        return self.square.getSquareMemberRelation(rq)
+        
+    @loggedIn
+    def getSquareMemberRelations(self, state=1, continuationToken=None, limit=50):
+        rq = GetSquareMemberRelationsRequest()
+        rq.state = state # 1 NONE, 2 BLOCKED
+        rq.continuationToken = continuationToken
+        rq.limit = limit
+        return self.square.getSquareMemberRelations(rq)
+        
+    @loggedIn
+    def getSquareChatMembers(self, squareChatMid, continuationToken=None, limit=50):
+        rq = GetSquareChatMembersRequest()
+        rq.squareChatMid = squareChatMid
+        rq.continuationToken = continuationToken
+        rq.limit = limit
+        return self.square.getSquareChatMembers(rq)
+        
+    @loggedIn
+    def getSquareChatStatus(self, squareChatMid):
+        rq = GetSquareChatStatusRequest()
+        rq.squareChatMid = squareChatMid
+        return self.square.getSquareChatStatus(rq)
+        
+    @loggedIn
+    def getSquareChat(self, squareChatMid):
+        rq = GetSquareChatStatusRequest()
+        rq.squareChatMid = squareChatMid
+        return self.square.getSquareChat(rq)
         
     @loggedIn
     def getSquare(self, mid):
@@ -120,3 +234,17 @@ class LineSquare(object):
         rq.continuationToken = continuationToken
         rq.limit = limit
         return self.square.getJoinedSquares(rq)
+        
+    @loggedIn
+    def getJoinableSquareChats(self, squareMid, continuationToken=None, limit=50):
+        rq = GetJoinableSquareChatsRequest()
+        rq.squareMid = squareMid
+        rq.continuationToken = continuationToken
+        rq.limit = limit
+        return self.square.getJoinableSquareChats(rq)
+        
+    @loggedIn
+    def getInvitationTicketUrl(self, mid):
+        rq = GetInvitationTicketUrlRequest()
+        rq.mid = mid
+        return self.square.getInvitationTicketUrl(rq)

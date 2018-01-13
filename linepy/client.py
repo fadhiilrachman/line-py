@@ -25,7 +25,6 @@ class LineClient(LineAuth, LineModels, LineTalk, LineSquare, LineCall):
         if id and passwd:
             self.login(_id=id, passwd=passwd, certificate=certificate, systemName=systemName, appName=appName, keepLoggedIn=keepLoggedIn)
 
-        self._messageReq = {}
         self.profile    = self.talk.getProfile()
         self.groups     = self.talk.getGroupIdsJoined()
 

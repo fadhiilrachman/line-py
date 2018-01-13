@@ -3,7 +3,7 @@ from thrift.transport import THttpClient
 from thrift.protocol import TCompactProtocol
 from akad import AuthService, TalkService, ChannelService, CallService, SquareService
 
-class LineSession:
+class Session:
 
     def __init__(self, url, headers, path=''):
         self.host = url + path

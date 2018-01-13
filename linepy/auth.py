@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from akad.ttypes import IdentityProvider, LoginResultType, LoginRequest, LoginType
 from .server import LineServer
-from .session import LineSession
+from .session import Session
 from .callback import Callback
 
 import rsa, os
@@ -21,11 +21,11 @@ class LineAuth(object):
         })
 
     def loadSession(self):
-        self.talk       = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_API_QUERY_PATH_FIR).Talk()
-        self.poll       = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_POLL_QUERY_PATH_FIR).Talk()
-        self.call       = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_CALL_QUERY_PATH).Call()
-        self.channel    = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_CHAN_QUERY_PATH).Channel()
-        self.square     = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_SQUARE_QUERY_PATH).Square()
+        self.talk       = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_API_QUERY_PATH_FIR).Talk()
+        self.poll       = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_POLL_QUERY_PATH_FIR).Talk()
+        self.call       = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_CALL_QUERY_PATH).Call()
+        self.channel    = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_CHAN_QUERY_PATH).Channel()
+        self.square     = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_SQUARE_QUERY_PATH).Square()
         
         self.revision = self.poll.getLastOpRevision()
         self.isLogin = True
@@ -45,11 +45,11 @@ class LineAuth(object):
         elif type == '1':
             lReq.type = LoginType.QRCODE
             lReq.keepLoggedIn = data['keepLoggedIn']
-            if data['identityProvider']:
+            if 'identityProvider' in data:
                 lReq.identityProvider = data['identityProvider']
-            if data['accessLocation']:
+            if 'accessLocation' in data:
                 lReq.accessLocation = data['accessLocation']
-            if data['systemName']:
+            if 'systemName' in data:
                 lReq.systemName = data['systemName']
             lReq.verifier = data['verifier']
             lReq.e2eeVersion = data['e2eeVersion']
@@ -68,7 +68,7 @@ class LineAuth(object):
         if appName is None:
             appName=self.server.APP_NAME
         self.server.setHeaders('X-Line-Application', appName)
-        self.tauth = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_AUTH_QUERY_PATH).Talk(isopen=False)
+        self.tauth = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_AUTH_QUERY_PATH).Talk(isopen=False)
 
         rsaKey = self.tauth.getRSAKeyInfo(self.provider)
         
@@ -93,7 +93,7 @@ class LineAuth(object):
                     with open(certificate, 'r') as f:
                         self.certificate = f.read()
 
-        self.auth = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Auth(isopen=False)
+        self.auth = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Auth(isopen=False)
 
         lReq = self.loginRequest('0', {
             'identityProvider': self.provider,
@@ -114,7 +114,7 @@ class LineAuth(object):
             self.server.setHeaders('X-Line-Access', result.verifier)
             getAccessKey = self.server.getJson(self.server.parseUrl(self.server.LINE_CERTIFICATE_PATH), allowHeader=True)
 
-            self.auth = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Auth(isopen=False)
+            self.auth = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Auth(isopen=False)
 
             try:
                 lReq = self.loginRequest('1', {
@@ -153,7 +153,7 @@ class LineAuth(object):
             appName=self.server.APP_NAME
         self.server.setHeaders('X-Line-Application', appName)
 
-        self.tauth = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_AUTH_QUERY_PATH).Talk(isopen=False)
+        self.tauth = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_AUTH_QUERY_PATH).Talk(isopen=False)
         qrCode = self.tauth.getAuthQrcode(keepLoggedIn, systemName)
 
         self.callback.QrUrl("line://au/q/" + qrCode.verifier, showQr)
@@ -161,7 +161,7 @@ class LineAuth(object):
 
         getAccessKey = self.server.getJson(self.server.parseUrl(self.server.LINE_CERTIFICATE_PATH), allowHeader=True)
         
-        self.auth = LineSession(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Auth(isopen=False)
+        self.auth = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Auth(isopen=False)
         
         try:
             lReq = self.loginRequest('1', {

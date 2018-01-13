@@ -14,6 +14,8 @@ def loggedIn(func):
 
 class LineTalk(object):
     isLogin = False
+    _messageReq = {}
+    _unsendMessageReq = 0
 
     def __init__(self):
         self.isLogin = True
@@ -130,25 +132,26 @@ class LineTalk(object):
         return self.sendMessage(to, '', contentMetadata, 9)
 
     @loggedIn
-    def unsendMessage(self, seq, messageId):
-        return self.talk.unsendMessage(seq, messageId)
+    def unsendMessage(self, messageId):
+        self._unsendMessageReq += 1
+        return self.talk.unsendMessage(self._unsendMessageReq, messageId)
 
     @loggedIn
-    def requestResendMessage(self, reqSeq, senderMid, messageId):
-        return self.talk.requestResendMessage(reqSeq, senderMid, messageId)
+    def requestResendMessage(self, senderMid, messageId):
+        return self.talk.requestResendMessage(self.revision, senderMid, messageId)
 
     @loggedIn
-    def respondResendMessage(self, reqSeq, receiverMid, originalMessageId, resendMessage, errorCode):
-        return self.talk.respondResendMessage(reqSeq, receiverMid, originalMessageId, resendMessage, errorCode)
+    def respondResendMessage(self, receiverMid, originalMessageId, resendMessage, errorCode):
+        return self.talk.respondResendMessage(self.revision, receiverMid, originalMessageId, resendMessage, errorCode)
 
     @loggedIn
     def removeMessage(self, messageId):
         return self.talk.removeMessage(messageId)
-        
+    
     @loggedIn
     def removeAllMessages(self, lastMessageId):
         return self.talk.removeAllMessages(0, lastMessageId)
-        
+    
     @loggedIn
     def sendChatChecked(self, consumer, messageId):
         return self.talk.sendChatChecked(0, consumer, messageId)
@@ -290,12 +293,12 @@ class LineTalk(object):
         return self.talk.getChatRoomAnnouncements(chatRoomMid)
 
     @loggedIn
-    def createChatRoomAnnouncement(self, reqSeq, chatRoomMid, type, contents):
-        return self.talk.createChatRoomAnnouncement(reqSeq, chatRoomMid, type, contents)
+    def createChatRoomAnnouncement(self, chatRoomMid, type, contents):
+        return self.talk.createChatRoomAnnouncement(self.revision, chatRoomMid, type, contents)
 
     @loggedIn
-    def removeChatRoomAnnouncement(self, reqSeq, chatRoomMid, announcementSeq):
-        return self.talk.removeChatRoomAnnouncement(reqSeq, chatRoomMid, announcementSeq)
+    def removeChatRoomAnnouncement(self, chatRoomMid, announcementSeq):
+        return self.talk.removeChatRoomAnnouncement(self.revision, chatRoomMid, announcementSeq)
 
     @loggedIn
     def getGroupWithoutMembers(self, groupId):
