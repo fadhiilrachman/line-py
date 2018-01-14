@@ -48,14 +48,14 @@ class Square(object):
     def deleteSquare(self, mid):
         rq = DeleteSquareRequest()
         rq.mid = mid
-        rq.revision = self.client.revision
+        rq.revision = self.revision
         return self.square.deleteSquare(rq)
 
     @loggedIn
     def deleteSquareChat(self, squareChatMid):
         rq = DeleteSquareChatRequest()
         rq.squareChatMid = squareChatMid
-        rq.revision = self.client.revision
+        rq.revision = self.revision
         return self.square.deleteSquareChat(request)
         
     @loggedIn
@@ -76,7 +76,7 @@ class Square(object):
     @loggedIn
     def createSquareChat(self, squareMid, name, squareMemberMids):
         rq = CreateSquareChatRequest()
-        rq.reqSeq = self.client.revision
+        rq.reqSeq = self.revision
         rq.squareChat = SquareChat()
         rq.squareChat.squareMid = squareMid
         rq.squareChat.name = name
@@ -250,10 +250,10 @@ class Square(object):
         msg.contentType, msg.contentMetadata = contentType, contentMetadata
         rq.squareMessage.message = msg
         rq.squareMessage.fromType = 4
-        if squareChatMid not in self.client._messageReq:
-            self.client._messageReq[squareChatMid] = -1
-        self.client._messageReq[squareChatMid] += 1
-        rq.squareMessage.squareMessageRevision = self.client._messageReq[squareChatMid]
+        if squareChatMid not in self._messageReq:
+            self._messageReq[squareChatMid] = -1
+        self._messageReq[squareChatMid] += 1
+        rq.squareMessage.squareMessageRevision = self._messageReq[squareChatMid]
         return self.square.sendMessage(rq)
 
     @loggedIn
