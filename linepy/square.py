@@ -211,7 +211,7 @@ class Square(object):
     def getSquare(self, squareMid):
         rq = GetSquareRequest()
         rq.squareMid = squareMid
-        return self.square.getSquare(mid)
+        return self.square.getSquare(rq)
         
     @loggedIn
     def getSquareChatAnnouncements(self, squareChatMid):
