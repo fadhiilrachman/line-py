@@ -250,10 +250,10 @@ class Square(object):
         msg.contentType, msg.contentMetadata = contentType, contentMetadata
         rq.squareMessage.message = msg
         rq.squareMessage.fromType = 4
-        if to not in self.client._messageReq:
-            self.client._messageReq[to] = -1
-        self.client._messageReq[to] += 1
-        rq.squareMessage.squareMessageRevision = self.client._messageReq[to]
+        if squareChatMid not in self.client._messageReq:
+            self.client._messageReq[squareChatMid] = -1
+        self.client._messageReq[squareChatMid] += 1
+        rq.squareMessage.squareMessageRevision = self.client._messageReq[squareChatMid]
         return self.square.sendMessage(rq)
 
     @loggedIn
