@@ -143,7 +143,7 @@ class Square(object):
         rq.member.squareMid = squareMid
         rq.member.displayName = displayName
         rq.member.profileImageObsHash = profileImageObsHash
-        return self.square.joinSquareChat(rq)
+        return self.square.joinSquare(rq)
         
     @loggedIn
     def inviteToSquare(self, squareMid, squareChatMid, invitees=[]):
@@ -203,7 +203,7 @@ class Square(object):
         
     @loggedIn
     def getSquareChat(self, squareChatMid):
-        rq = GetSquareChatStatusRequest()
+        rq = GetSquareChatRequest()
         rq.squareChatMid = squareChatMid
         return self.square.getSquareChat(rq)
         
@@ -270,7 +270,7 @@ class Square(object):
         rq = GetJoinedSquareChatsRequest()
         rq.continuationToken = continuationToken
         rq.limit = limit
-        return self.square.getJoinedSquares(rq)
+        return self.square.getJoinedSquareChats(rq)
         
     @loggedIn
     def getJoinableSquareChats(self, squareMid, continuationToken=None, limit=50):
