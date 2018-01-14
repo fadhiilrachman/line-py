@@ -1,0 +1,15 @@
+dist: trusty
+sudo: false
+language: python
+python:
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "pypy"   # PyPy2 5.8.0
+  - "pypy3"  # Pypy3 5.8.0-beta0
+install:
+  - pip install .
+  - pip install -r requirements.txt
+  - python setup.py -q install
+script: 
+  - pytest

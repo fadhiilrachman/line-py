@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 * Rename LinePoll instance as OEPoll instance
 * LineTimeline, LineCall, LineAuth, LineTalk, LineChannel renamed without 'Line'
 * LineTimeline merged to LINE instance
+* Add new sendPostToTalk, getGroupIdsByName, getCompactGroup, updateGroupPreferenceAttribute (thanks to [Dosugamea](https://github.com/fadhiilrachman/line-py/pull/4))
 * Some several bug fixed
 * Implement new feature in LINE Square
 
