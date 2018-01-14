@@ -121,7 +121,7 @@ class LineTalk(object):
         return self.sendMessage(to, '', contentMetadata, 13)
 
     @loggedIn
-    def sendGift(self, productId, productType):
+    def sendGift(self, to, productId, productType):
         if productType not in ['theme','sticker']:
             raise Exception('Invalid productType value')
         contentMetadata = {
