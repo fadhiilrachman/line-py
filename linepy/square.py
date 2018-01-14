@@ -9,7 +9,7 @@ def loggedIn(func):
             args[0].callback.other("You want to call the function, you must login to LINE")
     return checkLogin
 
-class LineSquare(object):
+class Square(object):
     isLogin = False
 
     def __init__(self):
@@ -212,6 +212,34 @@ class LineSquare(object):
         return self.square.getSquare(mid)
         
     @loggedIn
+    def getSquareChatAnnouncements(self, squareChatMid):
+        rq = GetSquareChatAnnouncementsRequest()
+        rq.squareChatMid = squareChatMid
+        return self.square.getSquareChatAnnouncements(rq)
+        
+    @loggedIn
+    def deleteSquareChatAnnouncement(self, squareChatMid, announcementSeq):
+        rq = DeleteSquareChatAnnouncementRequest()
+        rq.squareChatMid = squareChatMid
+        rq.squareChatMid = announcementSeq
+        return self.square.deleteSquareChatAnnouncement(rq)
+        
+    @loggedIn
+    def createSquareChatAnnouncement(self, squareChatMid, text, messageId=0, senderSquareMemberMid=0):
+        rq = CreateSquareChatAnnouncementRequest()
+        rq.reqSeq = 0
+        rq.squareChatMid = squareChatMid
+        rq.squareChatAnnouncement = SquareChatAnnouncement()
+        rq.squareChatAnnouncement.announcementSeq = 0
+        rq.squareChatAnnouncement.type = 0
+        rq.squareChatAnnouncement.contents = SquareChatAnnouncementContents()
+        rq.squareChatAnnouncement.contents.textMessageAnnouncementContents = TextMessageAnnouncementContents()
+        rq.squareChatAnnouncement.contents.textMessageAnnouncementContents.messageId = messageId
+        rq.squareChatAnnouncement.contents.textMessageAnnouncementContents.text = text
+        rq.squareChatAnnouncement.contents.textMessageAnnouncementContents.senderSquareMemberMid = senderSquareMemberMid
+        return self.square.createSquareChatAnnouncement(rq)
+        
+    @loggedIn
     def sendSquareMessage(self, squareChatMid, text, contentMetadata={}, contentType=0):
         rq = SendMessageRequest()
         rq.squareChatMid = squareChatMid
@@ -234,6 +262,13 @@ class LineSquare(object):
         rq.continuationToken = continuationToken
         rq.limit = limit
         return self.square.getJoinedSquares(rq)
+
+    @loggedIn
+    def getJoinedSquareChats(self, continuationToken=None, limit=50):
+        rq = GetJoinedSquareChatsRequest()
+        rq.continuationToken = continuationToken
+        rq.limit = limit
+        return self.square.getJoinedSquares(rq)
         
     @loggedIn
     def getJoinableSquareChats(self, squareMid, continuationToken=None, limit=50):
@@ -248,3 +283,35 @@ class LineSquare(object):
         rq = GetInvitationTicketUrlRequest()
         rq.mid = mid
         return self.square.getInvitationTicketUrl(rq)
+        
+    @loggedIn
+    def getSquareStatus(self, squareMid):
+        rq = GetSquareStatusRequest()
+        rq.squareMid = squareMid
+        return self.square.getSquareStatus(rq)
+        
+    @loggedIn
+    def getNoteStatus(self, squareMid):
+        rq = GetNoteStatusRequest()
+        rq.squareMid = squareMid
+        return self.square.getNoteStatus(rq)
+        
+    @loggedIn
+    def searchSquares(self, query, continuationToken=None, limit=50):
+        rq = SearchSquaresRequest()
+        rq.query = query
+        rq.continuationToken = continuationToken
+        rq.limit = limit
+        return self.square.searchSquares(rq)
+        
+    @loggedIn
+    def refreshSubscriptions(self, subscriptions=[]):
+        rq = RefreshSubscriptionsRequest()
+        rq.subscriptions = subscriptions
+        return self.square.refreshSubscriptions(rq)
+        
+    @loggedIn
+    def removeSubscriptions(self, unsubscriptions=[]):
+        rq = RemoveSubscriptionsRequest()
+        rq.unsubscriptions = unsubscriptions
+        return self.square.removeSubscriptions(rq)

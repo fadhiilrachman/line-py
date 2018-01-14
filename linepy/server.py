@@ -2,9 +2,9 @@
 from .config import Config
 import json, requests, urllib
 
-class LineServer(Config):
-    _session    = requests.session()
-    channelHeaders  = {}
+class Server(Config):
+    _session        = requests.session()
+    timelineHeaders = {}
     Headers         = {}
 
     def __init__(self):
@@ -33,11 +33,11 @@ class LineServer(Config):
     def setHeaders(self, argument, value):
         self.Headers[argument] = value
 
-    def setChannelHeadersWithDict(self, headersDict):
-        self.channelHeaders.update(headersDict)
+    def setTimelineHeadersWithDict(self, headersDict):
+        self.timelineHeaders.update(headersDict)
 
-    def setChannelHeaders(self, argument, value):
-        self.channelHeaders[argument] = value
+    def setTimelineHeaders(self, argument, value):
+        self.timelineHeaders[argument] = value
 
     def additionalHeaders(self, source, newSource):
         headerList={}

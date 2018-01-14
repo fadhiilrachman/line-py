@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ----
 
+**2018.01.15**
+
+* Updated to version 3.0.0
+* Support Thrift version 0.11.0
+* Not support for Python 2.x, please upgrade your Python 2.x to Python 3.x (Recommended 3.6)
+* Rename LineClient instance as LINE instance
+* Rename LinePoll instance as OEPoll instance
+* LineTimeline, LineCall, LineAuth, LineTalk, LineChannel renamed without 'Line'
+* LineTimeline merged to LINE instance
+* Some several bug fixed
+* Implement new feature in LINE Square
+
 **2018.01.13**
 
 * Updated to version 2.0.0
@@ -49,7 +61,7 @@ All notable changes to this project will be documented in this file.
 * Implement profile personalization with updateProfileVideoPicture()
 * Implement updateGroupPicture for group chat
 * Improve LineChannel and LineModels
-* Add LINE_SQUARE_QUERY_PATH in LineServer instance for LINE Square *soon
+* Add LINE_SQUARE_QUERY_PATH in LineServer instance for LINE Square
 
 **2017.11.11**
 

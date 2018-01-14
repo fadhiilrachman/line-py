@@ -9,7 +9,7 @@ def loggedIn(func):
             args[0].callback.other("You want to call the function, you must login to LINE")
     return checkLogin
     
-class LineCall(object):
+class Call(object):
     isLogin = False
 
     def __init__(self):

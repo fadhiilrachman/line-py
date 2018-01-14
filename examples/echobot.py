@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 from linepy import *
 
-client = LineClient()
-#client = LineClient(authToken='AUTHTOKEN')
+line = LINE('EMAIL', 'PASSWORD')
+#line = LINE('AUTHTOKEN')
 
-client.log("Auth Token : " + str(client.authToken))
+line.log("Auth Token : " + str(line.authToken))
 
-poll = LinePoll(client)
+# Initialize OEPoll with LINE instance
+oepoll = OEPoll(line)
 
-# Receive messages from LinePoll
+# Receive messages from OEPoll
 def RECEIVE_MESSAGE(op):
     msg = op.message
 
@@ -22,17 +23,17 @@ def RECEIVE_MESSAGE(op):
         # Check only group chat
         if msg.toType == 2:
             # Get sender contact
-            contact = client.getContact(sender)
+            contact = line.getContact(sender)
             txt = '[%s] %s' % (contact.displayName, text)
             # Send a message
-            client.sendMessage(receiver, txt)
+            line.sendMessage(receiver, txt)
             # Print log
-            client.log(txt)
+            line.log(txt)
 
-# Add function to LinePoll
-poll.addOpInterruptWithDict({
+# Add function to OEPoll
+oepoll.addOpInterruptWithDict({
     OpType.RECEIVE_MESSAGE: RECEIVE_MESSAGE
 })
 
 while True:
-    poll.trace()
+    oepoll.trace()

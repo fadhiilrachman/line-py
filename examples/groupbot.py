@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 from linepy import *
 
-client = LineClient()
-#client = LineClient(authToken='AUTHTOKEN')
+line = LINE('EMAIL', 'PASSWORD')
+#line = LINE('AUTHTOKEN')
 
-client.log("Auth Token : " + str(client.authToken))
+line.log("Auth Token : " + str(line.authToken))
+line.log("Timeline Token : " + str(line.tl.channelAccessToken))
 
-# Initialize LineChannel with LineClient
-channel = LineChannel(client)
-client.log("Channel Access Token : " + str(channel.channelAccessToken))
+# Initialize OEPoll with LINE instance
+oepoll = OEPoll(line)
 
-poll = LinePoll(client)
-
-# Receive messages from LinePoll
+# Receive messages from OEPoll
 def RECEIVE_MESSAGE(op):
     '''
         This is sample for implement BOT in LINE group
@@ -34,33 +32,33 @@ def RECEIVE_MESSAGE(op):
             # Check only group chat
             if msg.toType == 2:
                 # Chat checked request
-                client.sendChatChecked(receiver, msg_id)
+                line.sendChatChecked(receiver, msg_id)
                 # Get sender contact
-                contact = client.getContact(sender)
+                contact = line.getContact(sender)
                 # Command list
                 if text.lower() == 'hi':
-                    client.log('[%s] %s' % (contact.displayName, text))
-                    client.sendMessage(receiver, 'Hi too! How are you?')
+                    line.log('[%s] %s' % (contact.displayName, text))
+                    line.sendMessage(receiver, 'Hi too! How are you?')
                 elif text.lower() == '/author':
-                    client.log('[%s] %s' % (contact.displayName, text))
-                    client.sendMessage(receiver, 'My author is linepy')
+                    line.log('[%s] %s' % (contact.displayName, text))
+                    line.sendMessage(receiver, 'My author is linepy')
     except Exception as e:
-        client.log("[RECEIVE_MESSAGE] ERROR : " + str(e))
+        line.log("[RECEIVE_MESSAGE] ERROR : " + str(e))
     
 # Auto join if BOT invited to group
 def NOTIFIED_INVITE_INTO_GROUP(op):
     try:
         group_id=op.param1
         # Accept group invitation
-        client.acceptGroupInvitation(group_id)
+        line.acceptGroupInvitation(group_id)
     except Exception as e:
-        client.log("[NOTIFIED_INVITE_INTO_GROUP] ERROR : " + str(e))
+        line.log("[NOTIFIED_INVITE_INTO_GROUP] ERROR : " + str(e))
 
-# Add function to LinePoll
-poll.addOpInterruptWithDict({
+# Add function to OEPoll
+oepoll.addOpInterruptWithDict({
     OpType.RECEIVE_MESSAGE: RECEIVE_MESSAGE,
     OpType.NOTIFIED_INVITE_INTO_GROUP: NOTIFIED_INVITE_INTO_GROUP
 })
 
 while True:
-    poll.trace()
+    oepoll.trace()

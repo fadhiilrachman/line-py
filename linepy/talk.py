@@ -12,7 +12,7 @@ def loggedIn(func):
             args[0].callback.other("You want to call the function, you must login to LINE")
     return checkLogin
 
-class LineTalk(object):
+class Talk(object):
     isLogin = False
     _messageReq = {}
     _unsendMessageReq = 0
@@ -121,7 +121,7 @@ class LineTalk(object):
         return self.sendMessage(to, '', contentMetadata, 13)
 
     @loggedIn
-    def sendGift(self, productId, productType):
+    def sendGift(self, to, productId, productType):
         if productType not in ['theme','sticker']:
             raise Exception('Invalid productType value')
         contentMetadata = {
@@ -138,11 +138,11 @@ class LineTalk(object):
 
     @loggedIn
     def requestResendMessage(self, senderMid, messageId):
-        return self.talk.requestResendMessage(self.revision, senderMid, messageId)
+        return self.talk.requestResendMessage(0, senderMid, messageId)
 
     @loggedIn
     def respondResendMessage(self, receiverMid, originalMessageId, resendMessage, errorCode):
-        return self.talk.respondResendMessage(self.revision, receiverMid, originalMessageId, resendMessage, errorCode)
+        return self.talk.respondResendMessage(0, receiverMid, originalMessageId, resendMessage, errorCode)
 
     @loggedIn
     def removeMessage(self, messageId):
@@ -279,6 +279,7 @@ class LineTalk(object):
         profile.displayName = contact.displayName
         profile.statusMessage = contact.statusMessage
         profile.pictureStatus = contact.pictureStatus
+        self.updateProfileCoverById(self.getProfileCoverId(mid))
         self.updateProfileAttribute(8, profile.pictureStatus)
         return self.updateProfile(profile)
 
@@ -294,11 +295,11 @@ class LineTalk(object):
 
     @loggedIn
     def createChatRoomAnnouncement(self, chatRoomMid, type, contents):
-        return self.talk.createChatRoomAnnouncement(self.revision, chatRoomMid, type, contents)
+        return self.talk.createChatRoomAnnouncement(0, chatRoomMid, type, contents)
 
     @loggedIn
     def removeChatRoomAnnouncement(self, chatRoomMid, announcementSeq):
-        return self.talk.removeChatRoomAnnouncement(self.revision, chatRoomMid, announcementSeq)
+        return self.talk.removeChatRoomAnnouncement(0, chatRoomMid, announcementSeq)
 
     @loggedIn
     def getGroupWithoutMembers(self, groupId):
@@ -333,12 +334,33 @@ class LineTalk(object):
         return self.talk.getGroups(groupIds)
 
     @loggedIn
+    def getCompactGroup(self, groupId):
+        return self.talk.getCompactGroup(groupId)
+
+    @loggedIn
+    def getCompactRoom(self, roomId):
+        return self.talk.getCompactRoom(roomId)
+
+    @loggedIn
+    def getGroupIdsByName(self, groupName):
+        gIds = []
+        for gId in self.getGroupIdsJoined():
+            g = self.getCompactGroup(gId)
+            if groupName in g.name:
+                gIds.append(gId)
+        return gIds
+
+    @loggedIn
     def getGroupIdsInvited(self):
         return self.talk.getGroupIdsInvited()
 
     @loggedIn
     def getGroupIdsJoined(self):
         return self.talk.getGroupIdsJoined()
+
+    @loggedIn
+    def updateGroupPreferenceAttribute(self, groupMid, updatedAttrs):
+        return self.talk.updateGroupPreferenceAttribute(0, groupMid, updatedAttrs)
 
     @loggedIn
     def inviteIntoGroup(self, groupId, midlist):

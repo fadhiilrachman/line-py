@@ -1,26 +1,26 @@
 # -*- coding: utf-8 -*-
 from akad.ttypes import IdentityProvider, LoginResultType, LoginRequest, LoginType
-from .server import LineServer
+from .server import Server
 from .session import Session
 from .callback import Callback
 
 import rsa, os
 
-class LineAuth(object):
+class Auth(object):
     isLogin     = False
     authToken   = ""
     certificate = ""
 
     def __init__(self):
-        self.server = LineServer()
-        self.callback = Callback(self.defaultCallback)
+        self.server = Server()
+        self.callback = Callback(self.__defaultCallback)
         self.server.setHeadersWithDict({
             'User-Agent': self.server.USER_AGENT,
             'X-Line-Application': self.server.APP_NAME,
             'X-Line-Carrier': self.server.CARRIER
         })
 
-    def loadSession(self):
+    def __loadSession(self):
         self.talk       = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_API_QUERY_PATH_FIR).Talk()
         self.poll       = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_POLL_QUERY_PATH_FIR).Talk()
         self.call       = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_CALL_QUERY_PATH).Call()
@@ -30,7 +30,7 @@ class LineAuth(object):
         self.revision = self.poll.getLastOpRevision()
         self.isLogin = True
 
-    def loginRequest(self, type, data):
+    def __loginRequest(self, type, data):
         lReq = LoginRequest()
         if type == '0':
             lReq.type = LoginType.ID_CREDENTIAL
@@ -57,7 +57,7 @@ class LineAuth(object):
             lReq=False
         return lReq
 
-    def login(self, _id, passwd, certificate=None, systemName=None, appName=None, keepLoggedIn=True):
+    def loginWithCredential(self, _id, passwd, certificate=None, systemName=None, appName=None, keepLoggedIn=True):
         if systemName is None:
             systemName=self.server.SYSTEM_NAME
         if self.server.EMAIL_REGEX.match(_id):
@@ -95,7 +95,7 @@ class LineAuth(object):
 
         self.auth = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Auth(isopen=False)
 
-        lReq = self.loginRequest('0', {
+        lReq = self.__loginRequest('0', {
             'identityProvider': self.provider,
             'identifier': rsaKey.keynm,
             'password': crypto,
@@ -117,7 +117,7 @@ class LineAuth(object):
             self.auth = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Auth(isopen=False)
 
             try:
-                lReq = self.loginRequest('1', {
+                lReq = self.__loginRequest('1', {
                     'keepLoggedIn': keepLoggedIn,
                     'verifier': getAccessKey['result']['verifier'],
                     'e2eeVersion': 0
@@ -132,21 +132,21 @@ class LineAuth(object):
                         f.write(result.certificate)
                     self.certificate = result.certificate
                 if result.authToken is not None:
-                    self.tokenLogin(result.authToken, appName)
+                    self.loginWithAuthToken(result.authToken, appName)
                 else:
                     return False
             else:
                 raise Exception("Login failed")
 
         elif result.type == LoginResultType.REQUIRE_QRCODE:
-            self.qrLogin(keepLoggedIn, systemName, appName)
+            self.loginWithQrCode(keepLoggedIn, systemName, appName)
             pass
 
         elif result.type == LoginResultType.SUCCESS:
             self.certificate = result.certificate
-            self.tokenLogin(result.authToken, appName)
+            self.loginWithAuthToken(result.authToken, appName)
 
-    def qrLogin(self, keepLoggedIn=True, systemName=None, appName=None, showQr=False):
+    def loginWithQrCode(self, keepLoggedIn=True, systemName=None, appName=None, showQr=False):
         if systemName is None:
             systemName=self.server.SYSTEM_NAME
         if appName is None:
@@ -164,7 +164,7 @@ class LineAuth(object):
         self.auth = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Auth(isopen=False)
         
         try:
-            lReq = self.loginRequest('1', {
+            lReq = self.__loginRequest('1', {
                 'keepLoggedIn': keepLoggedIn,
                 'systemName': systemName,
                 'identityProvider': IdentityProvider.LINE,
@@ -178,13 +178,13 @@ class LineAuth(object):
 
         if result.type == LoginResultType.SUCCESS:
             if result.authToken is not None:
-                self.tokenLogin(result.authToken, appName)
+                self.loginWithAuthToken(result.authToken, appName)
             else:
                 return False
         else:
             raise Exception("Login failed")
 
-    def tokenLogin(self, authToken=None, appName=None):
+    def loginWithAuthToken(self, authToken=None, appName=None):
         if authToken is None:
             raise Exception('Please provide Auth Token')
         if appName is None:
@@ -194,9 +194,9 @@ class LineAuth(object):
             'X-Line-Access': authToken
         })
         self.authToken = authToken
-        self.loadSession()
+        self.__loadSession()
 
-    def defaultCallback(self, str):
+    def __defaultCallback(self, str):
         print(str)
 
     def logout(self):

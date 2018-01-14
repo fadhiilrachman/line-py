@@ -6,7 +6,7 @@ LINE Messaging's private API
 
 Requirements
 ============
-The linepy module only requires Python 2.7, or Python 3
+The linepy module only requires Python 3
 
 Installation
 ============
@@ -24,7 +24,7 @@ Usage
 ::
 
     >>> from linepy import *
-    >>> client = LineClient(id='EMAIL', passwd='PASSWORD')
-    >>> client.log("Auth Token : " + str(client.authToken))
+    >>> line = LINE('EMAIL', 'PASSWORD')
+    >>> line.log("Auth Token : " + str(line.authToken))
 
 All examples can be found `here <https://github.com/fadhiilrachman/line-py/tree/master/examples>`_.

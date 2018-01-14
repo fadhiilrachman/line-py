@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
 from linepy import *
 
-client = LineClient()
-#client = LineClient(authToken='AUTHTOKEN')
+line = LINE('EMAIL', 'PASSWORD')
+#line = LINE('AUTHTOKEN')
 
-client.log("Auth Token : " + str(client.authToken))
+line.log("Auth Token : " + str(line.authToken))
+line.log("Timeline Token : " + str(line.tl.channelAccessToken))
 
-# Initialize LineChannel with LineClient
-channel = LineChannel(client)
-client.log("Channel Access Token : " + str(channel.channelAccessToken))
-
-poll = LinePoll(client)
+# Initialize OEPoll with LINE instance
+oepoll = OEPoll(line)
 
 while True:
     try:
-        ops=poll.singleTrace(count=50)
+        ops=oepoll.singleTrace(count=50)
         
         for op in ops:
             # Receive messages
@@ -39,31 +37,31 @@ while True:
                         # Check only group chat
                         if msg.toType == 2:
                             # Chat checked request
-                            client.sendChatChecked(receiver, msg_id)
+                            line.sendChatChecked(receiver, msg_id)
                             # Get sender contact
-                            contact = client.getContact(sender)
+                            contact = line.getContact(sender)
                             # Command list
                             if text.lower() == 'hi':
-                                client.log('[%s] %s' % (contact.displayName, text))
-                                client.sendMessage(receiver, 'Hi too! How are you?')
+                                line.log('[%s] %s' % (contact.displayName, text))
+                                line.sendMessage(receiver, 'Hi too! How are you?')
                             elif text.lower() == '/author':
-                                client.log('[%s] %s' % (contact.displayName, text))
-                                client.sendMessage(receiver, 'My author is linepy')
+                                line.log('[%s] %s' % (contact.displayName, text))
+                                line.sendMessage(receiver, 'My author is linepy')
                 except Exception as e:
-                    client.log("[RECEIVE_MESSAGE] ERROR : " + str(e))
+                    line.log("[RECEIVE_MESSAGE] ERROR : " + str(e))
             # Auto join if BOT invited to group
             elif op.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
                 try:
                     group_id=op.param1
                     # Accept group invitation
-                    client.acceptGroupInvitation(group_id)
+                    line.acceptGroupInvitation(group_id)
                 except Exception as e:
-                    client.log("[NOTIFIED_INVITE_INTO_GROUP] ERROR : " + str(e))
+                    line.log("[NOTIFIED_INVITE_INTO_GROUP] ERROR : " + str(e))
             else:
                 pass
 
             # Don't remove this line, if you wan't get error soon!
-            poll.setRevision(op.revision)
+            oepoll.setRevision(op.revision)
             
     except Exception as e:
-        client.log("[SINGLE_TRACE] ERROR : " + str(e))
+        line.log("[SINGLE_TRACE] ERROR : " + str(e))
