@@ -53,10 +53,11 @@ class LineTimeline(object):
     """Post"""
 
     @loggedIn
-    def createPost(self, text):
-        params = {'homeId': mid, 'sourceType': 'TIMELINE'}
-        url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v33/post/create.json', params)
+    def createPost(self,text, holdingTime=None):
+        url = self.server.LINE_TIMELINE_API + '/v33/post/create.json'
         payload = {'postInfo': {'readPermission': {'type': 'ALL'}}, 'sourceType': 'TIMELINE', 'contents': {'text': text}}
+        if holdingTime != None:
+            payload["postInfo"]["holdingTime"] = holdingTime
         data = json.dumps(payload)
         r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
         return r.json()
@@ -101,6 +102,13 @@ class LineTimeline(object):
         url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v33/like/cancel.json', params)
         data = {'activityExternalId': postId, 'actorId': mid}
         r = self.server.postContent(url, data=data, headers=self.server.channelHeaders)
+        return r.json()
+
+    @loggedIn
+    def sendPostToTalk(self, mid, postId=1137352897406010950):
+        params = {'postId': postId,'receiveMid': mid}
+        url = self.server.urlEncode(self.server.LINE_TIMELINE_MH, '/api/v33/post/sendPostToTalk.json', params)
+        r = self.server.getContent(url, headers=self.server.channelHeaders)
         return r.json()
 
     """Group Post"""
