@@ -230,7 +230,7 @@ class Talk(object):
 
     @loggedIn
     def findAndAddContactsByMid(self, mid):
-        return self.talk.findAndAddContactsByMid(0, mid)
+        return self.talk.findAndAddContactsByMid(0, mid,5,"")
 
     @loggedIn
     def findAndAddContactsByUserid(self, userid):
