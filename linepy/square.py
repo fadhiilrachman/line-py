@@ -31,7 +31,7 @@ class Square(object):
 
     @loggedIn
     def sendSquareImage(self, squareChatMid, path): # Under development
-        return self.uploadObjSquare(to=squareChatMid, path=path, type='image', returnAs='bool')
+        return self.uploadObjSquare(squareChatMid=squareChatMid, path=path, type='image', returnAs='bool')
 
     @loggedIn
     def sendSquareImageWithURL(self, squareChatMid, url): # Under development
@@ -40,7 +40,7 @@ class Square(object):
 
     @loggedIn
     def sendSquareGIF(self, squareChatMid, path): # Under development
-        return self.uploadObjSquare(to=squareChatMid, path=path, type='gif', returnAs='bool')
+        return self.uploadObjSquare(squareChatMid=squareChatMid, path=path, type='gif', returnAs='bool')
 
     @loggedIn
     def sendSquareGIFWithURL(self, squareChatMid, url): # Under development
@@ -49,7 +49,7 @@ class Square(object):
 
     @loggedIn
     def sendSquareVideo(self, squareChatMid, path): # Under development
-        return self.uploadObjSquare(to=squareChatMid, path=path, type='video', returnAs='bool')
+        return self.uploadObjSquare(squareChatMid=squareChatMid, path=path, type='video', returnAs='bool')
 
     @loggedIn
     def sendSquareVideoWithURL(self, squareChatMid, url): # Under development
@@ -58,7 +58,7 @@ class Square(object):
 
     @loggedIn
     def sendSquareAudio(self, squareChatMid, path): # Under development
-        return self.uploadObjSquare(to=squareChatMid, path=path, type='audio', returnAs='bool')
+        return self.uploadObjSquare(squareChatMid=squareChatMid, path=path, type='audio', returnAs='bool')
 
     @loggedIn
     def sendSquareAudioWithURL(self, squareChatMid, url): # Under development
@@ -67,7 +67,7 @@ class Square(object):
 
     @loggedIn
     def sendSquareFile(self, squareChatMid, path): # Under development
-        return self.uploadObjSquare(to=squareChatMid, path=path, type='file', returnAs='bool')
+        return self.uploadObjSquare(squareChatMid=squareChatMid, path=path, type='file', returnAs='bool')
 
     @loggedIn
     def sendSquareFileWithURL(self, squareChatMid, url, fileName=''): # Under development
