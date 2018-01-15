@@ -55,5 +55,5 @@ while True:
                     else:
                         pass
             
-    except:
-        line.log("[FETCH_SQUARE] Fetch square chat error")
+    except Exception as e:
+        line.log("[FETCH_SQUARE] Fetch square chat error: " + str(e))
