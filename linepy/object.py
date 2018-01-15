@@ -7,7 +7,7 @@ def loggedIn(func):
         if args[0].isLogin:
             return func(*args, **kwargs)
         else:
-            args[0].callback.other("You want to call the function, you must login to LINE")
+            args[0].callback.other('You want to call the function, you must login to LINE')
     return checkLogin
     
 class Object(object):
@@ -69,6 +69,43 @@ class Object(object):
             return True
 
     """Object"""
+
+    @loggedIn
+    def uploadObjSquare(self, squareChatMid, path, type='image', returnAs='bool'):
+        if returnAs not in ['bool']:
+            raise Exception('Invalid returnAs value')
+        if type not in ['image','gif','video','audio','file']:
+            raise Exception('Invalid type value')
+        data = open(path, 'rb').read()
+        params = {
+            'oid': 'reqseq',
+            'reqseq': '%s' % str(self.revision),
+            'tomid': '%s' % str(squareChatMid),
+            'size': '%s' % str(len(data)),
+            'range': len(data),
+            'type': '%s' % str(type)
+        }
+        if type == 'image':
+            contentType = 'image/jpeg'
+        elif type == 'gif':
+            contentType = 'image/gif'
+        elif type == 'video':
+            params.update({'duration': '60000'})
+            contentType = 'video/mp4'
+        elif type == 'audio':
+            params.update({'duration': '0'})
+            contentType = 'audio/mp3'
+        headers = self.server.additionalHeaders(self.server.Headers, {
+            'content-type': contentType,
+            'Content-Length': str(len(data)),
+            'x-obs-params': self.genOBSParams(params,'b64'),
+            'X-Line-Access': self.squareObsToken
+        })
+        r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/r/g2/m/reqseq', data=data, headers=headers)
+        if r.status_code != 201:
+            raise Exception('Upload %s failure.' % type)
+        if returnAs == 'bool':
+            return True
 
     @loggedIn
     def uploadObjTalk(self, path, type='image', returnAs='bool', objId=None, to=None):

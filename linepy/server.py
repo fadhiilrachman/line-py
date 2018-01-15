@@ -16,10 +16,7 @@ class Server(Config):
         return self.LINE_HOST_DOMAIN + path
 
     def urlEncode(self, url, path, params=[]):
-        try:        # Works with python 2.x
-            return url + path + '?' + urllib.urlencode(params)
-        except:     # Works with python 3.x
-            return url + path + '?' + urllib.parse.urlencode(params)
+        return url + path + '?' + urllib.parse.urlencode(params)
 
     def getJson(self, url, allowHeader=False):
         if allowHeader is False:

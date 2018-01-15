@@ -9,10 +9,10 @@ class Callback(object):
 
     def QrUrl(self, url, showQr=True):
         if showQr:
-            notice="or scan this QR "
+            notice='or scan this QR '
         else:
-            notice=""
-        self.callback("Open this link " + notice + "on your LINE for smartphone in 2 minutes\n" + url)
+            notice=''
+        self.callback('Open this link ' + notice + 'on your LINE for smartphone in 2 minutes\n' + url)
         if showQr:
             try:
                 import pyqrcode

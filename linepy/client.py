@@ -31,5 +31,3 @@ class LINE(Auth, Models, Talk, Square, Call, Timeline):
         Square.__init__(self)
         Call.__init__(self)
         Timeline.__init__(self)
-
-        self.squares    = self.getJoinedSquares()

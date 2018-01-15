@@ -2,15 +2,17 @@
 from .client import LINE
 from types import *
 
-import os, sys, threading
+import os, sys, threading, time
 
 class OEPoll(object):
     OpInterrupt = {}
     client = None
+    __squareSubId = {}
+    __squareSyncToken = {}
 
     def __init__(self, client):
         if type(client) is not LINE:
-            raise Exception("You need to set LINE instance to initialize OEPoll")
+            raise Exception('You need to set LINE instance to initialize OEPoll')
         self.client = client
     
     def __fetchOperation(self, revision, count=1):
@@ -56,10 +58,20 @@ class OEPoll(object):
             exit()
         except:
             return
-
-        # Add for Square Poll
         
         for op in operations:
             if op.type in self.OpInterrupt.keys():
                 self.__execute(op, threading)
             self.setRevision(op.revision)
+
+    def singleFetchSquareChat(self, squareChatMid, limit=1):
+        if squareChatMid not in self.__squareSubId:
+            self.__squareSubId[squareChatMid] = 0
+        if squareChatMid not in self.__squareSyncToken:
+            self.__squareSyncToken[squareChatMid] = ''
+        
+        sqcEvents = self.client.fetchSquareChatEvents(squareChatMid, subscriptionId=self.__squareSubId[squareChatMid], syncToken=self.__squareSyncToken[squareChatMid], limit=limit, direction=1)
+        self.__squareSubId[squareChatMid] = sqcEvents.subscription
+        self.__squareSyncToken[squareChatMid] = sqcEvents.syncToken
+
+        return sqcEvents.events

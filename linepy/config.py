@@ -24,7 +24,7 @@ class Config(object):
         'LINE_TODAY': '1518712866',
         'LINE_STORE': '1376922440',
         'LINE_MUSIC': '1381425814',
-        'LINE_BUSINESS': '1459630796'
+        'LINE_SERVICES': '1459630796'
     }
 
     APP_TYPE    = ApplicationType._VALUES_TO_NAMES[96]

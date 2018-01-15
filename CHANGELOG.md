@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ----
 
+**2018.01.16**
+
+* Implement singleFetchSquareChat in OEPoll
+* Add new example for Fetch square chat
+* Fix findAndAddContactsByMid (thanks to [かおる](https://github.com/fadhiilrachman/line-py/pull/23))
+* Some several bug fixed
+
 **2018.01.15**
 
 * Updated to version 3.0.0

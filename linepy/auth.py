@@ -76,12 +76,7 @@ class Auth(object):
                    chr(len(_id)) + _id +
                    chr(len(passwd)) + passwd).encode('utf-8')
         pub_key = rsa.PublicKey(int(rsaKey.nvalue, 16), int(rsaKey.evalue, 16))
-        try:
-            # Works with python 2.7
-            crypto = rsa.encrypt(message, pub_key).encode('hex')
-        except:
-            # Works with python 3.x
-            crypto = rsa.encrypt(message, pub_key).hex()
+        crypto = rsa.encrypt(message, pub_key).hex()
 
         try:
             with open(_id + '.crt', 'r') as f:
@@ -124,7 +119,7 @@ class Auth(object):
                 })
                 result = self.auth.loginZ(lReq)
             except:
-                raise Exception("Login failed")
+                raise Exception('Login failed')
             
             if result.type == LoginResultType.SUCCESS:
                 if result.certificate is not None:
@@ -136,7 +131,7 @@ class Auth(object):
                 else:
                     return False
             else:
-                raise Exception("Login failed")
+                raise Exception('Login failed')
 
         elif result.type == LoginResultType.REQUIRE_QRCODE:
             self.loginWithQrCode(keepLoggedIn, systemName, appName)
@@ -156,7 +151,7 @@ class Auth(object):
         self.tauth = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_AUTH_QUERY_PATH).Talk(isopen=False)
         qrCode = self.tauth.getAuthQrcode(keepLoggedIn, systemName)
 
-        self.callback.QrUrl("line://au/q/" + qrCode.verifier, showQr)
+        self.callback.QrUrl('line://au/q/' + qrCode.verifier, showQr)
         self.server.setHeaders('X-Line-Access', qrCode.verifier)
 
         getAccessKey = self.server.getJson(self.server.parseUrl(self.server.LINE_CERTIFICATE_PATH), allowHeader=True)
@@ -174,7 +169,7 @@ class Auth(object):
             })
             result = self.auth.loginZ(lReq)
         except:
-            raise Exception("Login failed")
+            raise Exception('Login failed')
 
         if result.type == LoginResultType.SUCCESS:
             if result.authToken is not None:
@@ -182,7 +177,7 @@ class Auth(object):
             else:
                 return False
         else:
-            raise Exception("Login failed")
+            raise Exception('Login failed')
 
     def loginWithAuthToken(self, authToken=None, appName=None):
         if authToken is None:

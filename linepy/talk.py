@@ -9,7 +9,7 @@ def loggedIn(func):
         if args[0].isLogin:
             return func(*args, **kwargs)
         else:
-            args[0].callback.other("You want to call the function, you must login to LINE")
+            args[0].callback.other('You want to call the function, you must login to LINE')
     return checkLogin
 
 class Talk(object):
@@ -21,6 +21,10 @@ class Talk(object):
         self.isLogin = True
 
     """User"""
+
+    @loggedIn
+    def acquireEncryptedAccessToken(self, featureType=2):
+        return self.talk.acquireEncryptedAccessToken(featureType)
 
     @loggedIn
     def getProfile(self):
@@ -132,6 +136,17 @@ class Talk(object):
         return self.sendMessage(to, '', contentMetadata, 9)
 
     @loggedIn
+    def sendMessageAwaitCommit(self, to, text, contentMetadata={}, contentType=0):
+        msg = Message()
+        msg.to, msg._from = to, self.profile.mid
+        msg.text = text
+        msg.contentType, msg.contentMetadata = contentType, contentMetadata
+        if to not in self._messageReq:
+            self._messageReq[to] = -1
+        self._messageReq[to] += 1
+        return self.talk.sendMessageAwaitCommit(self._messageReq[to], msg)
+
+    @loggedIn
     def unsendMessage(self, messageId):
         self._unsendMessageReq += 1
         return self.talk.unsendMessage(self._unsendMessageReq, messageId)
@@ -151,6 +166,14 @@ class Talk(object):
     @loggedIn
     def removeAllMessages(self, lastMessageId):
         return self.talk.removeAllMessages(0, lastMessageId)
+
+    @loggedIn
+    def removeMessageFromMyHome(self, messageId):
+        return self.talk.removeMessageFromMyHome(messageId)
+
+    @loggedIn
+    def destroyMessage(self, chatId, messageId):
+        return self.talk.destroyMessage(0, chatId, messageId, sessionId)
     
     @loggedIn
     def sendChatChecked(self, consumer, messageId):
@@ -162,7 +185,11 @@ class Talk(object):
 
     @loggedIn
     def getLastReadMessageIds(self, chatId):
-        return self.talk.getLastReadMessageIds(0,chatId)
+        return self.talk.getLastReadMessageIds(0, chatId)
+
+    @loggedIn
+    def getPreviousMessagesV2WithReadCount(self, messageBoxId, endMessageId, messagesCount=50):
+        return self.talk.getPreviousMessagesV2WithReadCount(messageBoxId, endMessageId, messagesCount)
 
     """Object"""
 
@@ -229,8 +256,16 @@ class Talk(object):
         return self.talk.unblockContact(0, mid)
 
     @loggedIn
+    def findAndAddContactByMetaTag(self, userid, reference):
+        return self.talk.findAndAddContactByMetaTag(0, userid, reference)
+
+    @loggedIn
     def findAndAddContactsByMid(self, mid):
-        return self.talk.findAndAddContactsByMid(0, mid)
+        return self.talk.findAndAddContactsByMid(0, mid, 0, '')
+
+    @loggedIn
+    def findAndAddContactsByEmail(self, emails=[]):
+        return self.talk.findAndAddContactsByEmail(0, emails)
 
     @loggedIn
     def findAndAddContactsByUserid(self, userid):
@@ -269,6 +304,18 @@ class Talk(object):
         return self.talk.getHiddenContactMids()
 
     @loggedIn
+    def tryFriendRequest(self, midOrEMid, friendRequestParams, method=1):
+        return self.talk.tryFriendRequest(midOrEMid, method, friendRequestParams)
+
+    @loggedIn
+    def makeUserAddMyselfAsContact(self, contactOwnerMid):
+        return self.talk.makeUserAddMyselfAsContact(contactOwnerMid)
+
+    @loggedIn
+    def getContactWithFriendRequestStatus(self, id):
+        return self.talk.getContactWithFriendRequestStatus(id)
+
+    @loggedIn
     def reissueUserTicket(self, expirationTime=100, maxUseCount=100):
         return self.talk.reissueUserTicket(expirationTime, maxUseCount)
     
@@ -279,7 +326,8 @@ class Talk(object):
         profile.displayName = contact.displayName
         profile.statusMessage = contact.statusMessage
         profile.pictureStatus = contact.pictureStatus
-        self.updateProfileCoverById(self.getProfileCoverId(mid))
+        if self.getProfileCoverId(mid) is not None:
+            self.updateProfileCoverById(self.getProfileCoverId(mid))
         self.updateProfileAttribute(8, profile.pictureStatus)
         return self.updateProfile(profile)
 
@@ -332,6 +380,10 @@ class Talk(object):
     @loggedIn
     def getGroups(self, groupIds):
         return self.talk.getGroups(groupIds)
+
+    @loggedIn
+    def getGroupsV2(self, groupIds):
+        return self.talk.getGroupsV2(groupIds)
 
     @loggedIn
     def getCompactGroup(self, groupId):
@@ -409,3 +461,13 @@ class Talk(object):
     @loggedIn
     def acquireCallTalkRoute(self, to):
         return self.talk.acquireCallRoute(to)
+    
+    """Report"""
+
+    @loggedIn
+    def reportSpam(self, chatMid, memberMids=[], spammerReasons=[], senderMids=[], spamMessageIds=[], spamMessages=[]):
+        return self.talk.reportSpam(chatMid, memberMids, spammerReasons, senderMids, spamMessageIds, spamMessages)
+        
+    @loggedIn
+    def reportSpammer(self, spammerMid, spammerReasons=[], spamMessageIds=[]):
+        return self.talk.reportSpammer(spammerMid, spammerReasons, spamMessageIds)
