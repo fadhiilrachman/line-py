@@ -83,7 +83,7 @@ class Timeline(Channel):
 
     @loggedIn
     def createPost(self, text, holdingTime=None):
-        params = {'homeId': mid, 'sourceType': 'TIMELINE'}
+        params = {'homeId': self.profile.mid, 'sourceType': 'TIMELINE'}
         url = self.server.urlEncode(self.server.LINE_TIMELINE_API, '/v39/post/create.json', params)
         payload = {'postInfo': {'readPermission': {'type': 'ALL'}}, 'sourceType': 'TIMELINE', 'contents': {'text': text}}
         if holdingTime != None:
