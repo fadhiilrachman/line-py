@@ -7,15 +7,23 @@ from .square import Square
 from .call import Call
 from .timeline import Timeline
 
+
 class LINE(Auth, Models, Talk, Square, Call, Timeline):
 
-    def __init__(self, idOrAuthToken=None, passwd=None, certificate=None, systemName=None, appName=None, showQr=False, keepLoggedIn=True):
-        
+    def __init__(self, idOrAuthToken=None, passwd=None,
+                 certificate=None, systemName=None, appName=None,
+                 showQr=False, keepLoggedIn=True):
+
         Auth.__init__(self)
         if not (idOrAuthToken or idOrAuthToken and passwd):
-            self.loginWithQrCode(keepLoggedIn=keepLoggedIn, systemName=systemName, appName=appName, showQr=showQr)
+            self.loginWithQrCode(keepLoggedIn=keepLoggedIn,
+                                 systemName=systemName, appName=appName,
+                                 showQr=showQr)
         if idOrAuthToken and passwd:
-            self.loginWithCredential(_id=idOrAuthToken, passwd=passwd, certificate=certificate, systemName=systemName, appName=appName, keepLoggedIn=keepLoggedIn)
+            self.loginWithCredential(_id=idOrAuthToken, passwd=passwd,
+                                     certificate=certificate,
+                                     systemName=systemName, appName=appName,
+                                     keepLoggedIn=keepLoggedIn)
         elif idOrAuthToken and not passwd:
             self.loginWithAuthToken(authToken=idOrAuthToken, appName=appName)
 
@@ -23,8 +31,8 @@ class LINE(Auth, Models, Talk, Square, Call, Timeline):
 
     def __initAll(self):
 
-        self.profile    = self.talk.getProfile()
-        self.groups     = self.talk.getGroupIdsJoined()
+        self.profile = self.talk.getProfile()
+        self.groups = self.talk.getGroupIdsJoined()
 
         Models.__init__(self)
         Talk.__init__(self)

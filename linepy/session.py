@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from thrift.transport import THttpClient
 from thrift.protocol import TCompactProtocol
-from akad import AuthService, TalkService, ChannelService, CallService, SquareService
+from akad import AuthService, TalkService, ChannelService,\
+    CallService, SquareService
+
 
 class Session:
 
@@ -12,10 +14,10 @@ class Session:
     def Auth(self, isopen=True):
         self.transport = THttpClient.THttpClient(self.host)
         self.transport.setCustomHeaders(self.headers)
-        
+
         self.protocol = TCompactProtocol.TCompactProtocol(self.transport)
-        self._auth  = AuthService.Client(self.protocol)
-        
+        self._auth = AuthService.Client(self.protocol)
+
         if isopen:
             self.transport.open()
 
@@ -24,10 +26,10 @@ class Session:
     def Talk(self, isopen=True):
         self.transport = THttpClient.THttpClient(self.host)
         self.transport.setCustomHeaders(self.headers)
-        
+
         self.protocol = TCompactProtocol.TCompactProtocol(self.transport)
-        self._talk  = TalkService.Client(self.protocol)
-        
+        self._talk = TalkService.Client(self.protocol)
+
         if isopen:
             self.transport.open()
 
@@ -38,8 +40,8 @@ class Session:
         self.transport.setCustomHeaders(self.headers)
 
         self.protocol = TCompactProtocol.TCompactProtocol(self.transport)
-        self._channel  = ChannelService.Client(self.protocol)
-        
+        self._channel = ChannelService.Client(self.protocol)
+
         if isopen:
             self.transport.open()
 
@@ -50,8 +52,8 @@ class Session:
         self.transport.setCustomHeaders(self.headers)
 
         self.protocol = TCompactProtocol.TCompactProtocol(self.transport)
-        self._call  = CallService.Client(self.protocol)
-        
+        self._call = CallService.Client(self.protocol)
+
         if isopen:
             self.transport.open()
 
@@ -62,8 +64,8 @@ class Session:
         self.transport.setCustomHeaders(self.headers)
 
         self.protocol = TCompactProtocol.TCompactProtocol(self.transport)
-        self._square  = SquareService.Client(self.protocol)
-        
+        self._square = SquareService.Client(self.protocol)
+
         if isopen:
             self.transport.open()
 

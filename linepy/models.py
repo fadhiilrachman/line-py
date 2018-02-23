@@ -3,10 +3,16 @@ from datetime import datetime
 from .object import Object
 from random import randint
 
-import json, shutil, time, os, base64, tempfile
-    
+import json
+import shutil
+import time
+import os
+import base64
+import tempfile
+
+
 class Models(Object):
-        
+
     def __init__(self):
         Object.__init__(self)
 
@@ -28,8 +34,9 @@ class Models(Object):
         else:
             return False
 
-    def downloadFileURL(self, fileUrl, returnAs='path', saveAs='', headers=None):
-        if returnAs not in ['path','bool','bin']:
+    def downloadFileURL(self, fileUrl, returnAs='path',
+                        saveAs='', headers=None):
+        if returnAs not in ['path', 'bool', 'bin']:
             raise Exception('Invalid returnAs value')
         if saveAs == '':
             saveAs = self.genTempFile()
@@ -49,9 +56,10 @@ class Models(Object):
 
     def genTempFile(self, returnAs='path'):
         try:
-            if returnAs not in ['file','path']:
+            if returnAs not in ['file', 'path']:
                 raise Exception('Invalid returnAs value')
-            fName, fPath = 'linepy-%s-%i.bin' % (int(time.time()), randint(0, 9)), tempfile.gettempdir()
+            fName = 'linepy-%s-%i.bin' % (int(time.time()), randint(0, 9))
+            fPath = tempfile.gettempdir()
             if returnAs == 'file':
                 return fName
             elif returnAs == 'path':
@@ -60,18 +68,19 @@ class Models(Object):
             raise Exception('tempfile is required')
 
     def genOBSParams(self, newList, returnAs='json'):
-        oldList = {'name': self.genTempFile('file'),'ver': '1.0'}
-        if returnAs not in ['json','b64','default']:
+        oldList = {'name': self.genTempFile('file'), 'ver': '1.0'}
+        if returnAs not in ['json', 'b64', 'default']:
             raise Exception('Invalid parameter returnAs')
         oldList.update(newList)
         if 'range' in oldList:
-            new_range='bytes 0-%s\/%s' % ( str(oldList['range']-1), str(oldList['range']) )
+            new_range = 'bytes 0-%s\/%s' % (str(oldList['range'] - 1),
+                                            str(oldList['range']))
             oldList.update({'range': new_range})
         if returnAs == 'json':
-            oldList=json.dumps(oldList)
+            oldList = json.dumps(oldList)
             return oldList
         elif returnAs == 'b64':
-            oldList=json.dumps(oldList)
+            oldList = json.dumps(oldList)
             return base64.b64encode(oldList.encode('utf-8'))
         elif returnAs == 'default':
             return oldList
