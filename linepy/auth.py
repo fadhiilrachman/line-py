@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
-from akad.ttypes import IdentityProvider, LoginResultType, LoginRequest, LoginType
+from akad.ttypes import IdentityProvider, LoginResultType,\
+    LoginRequest, LoginType
 from .server import Server
 from .session import Session
 from .callback import Callback
 
-import rsa, os
+import rsa
+import os
+
 
 class Auth(object):
-    isLogin     = False
-    authToken   = ""
+    isLogin = False
+    authToken = ""
     certificate = ""
 
     def __init__(self):
@@ -21,12 +24,27 @@ class Auth(object):
         })
 
     def __loadSession(self):
-        self.talk       = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_API_QUERY_PATH_FIR).Talk()
-        self.poll       = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_POLL_QUERY_PATH_FIR).Talk()
-        self.call       = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_CALL_QUERY_PATH).Call()
-        self.channel    = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_CHAN_QUERY_PATH).Channel()
-        self.square     = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_SQUARE_QUERY_PATH).Square()
-        
+        self.talk = Session(
+            self.server.LINE_HOST_DOMAIN,
+            self.server.Headers,
+            self.server.LINE_API_QUERY_PATH_FIR).Talk()
+        self.poll = Session(
+            self.server.LINE_HOST_DOMAIN,
+            self.server.Headers,
+            self.server.LINE_POLL_QUERY_PATH_FIR).Talk()
+        self.call = Session(
+            self.server.LINE_HOST_DOMAIN,
+            self.server.Headers,
+            self.erver.LINE_CALL_QUERY_PATH).Call()
+        self.channel = Session(
+            self.server.LINE_HOST_DOMAIN,
+            self.server.Headers,
+            self.server.LINE_CHAN_QUERY_PATH).Channel()
+        self.square = Session(
+            self.server.LINE_HOST_DOMAIN,
+            self.server.Headers,
+            self.server.LINE_SQUARE_QUERY_PATH).Square()
+
         self.revision = self.poll.getLastOpRevision()
         self.isLogin = True
 
@@ -54,24 +72,29 @@ class Auth(object):
             lReq.verifier = data['verifier']
             lReq.e2eeVersion = data['e2eeVersion']
         else:
-            lReq=False
+            lReq = False
         return lReq
 
-    def loginWithCredential(self, _id, passwd, certificate=None, systemName=None, appName=None, keepLoggedIn=True):
+    def loginWithCredential(
+            self, _id, passwd, certificate=None, systemName=None,
+            appName=None, keepLoggedIn=True):
         if systemName is None:
-            systemName=self.server.SYSTEM_NAME
+            systemName = self.server.SYSTEM_NAME
         if self.server.EMAIL_REGEX.match(_id):
             self.provider = IdentityProvider.LINE       # LINE
         else:
             self.provider = IdentityProvider.NAVER_KR   # NAVER
-        
+
         if appName is None:
-            appName=self.server.APP_NAME
+            appName = self.server.APP_NAME
         self.server.setHeaders('X-Line-Application', appName)
-        self.tauth = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_AUTH_QUERY_PATH).Talk(isopen=False)
+        self.tauth = Session(
+            self.server.LINE_HOST_DOMAIN,
+            self.server.Headers,
+            self.server.LINE_AUTH_QUERY_PATH).Talk(isopen=False)
 
         rsaKey = self.tauth.getRSAKeyInfo(self.provider)
-        
+
         message = (chr(len(rsaKey.sessionKey)) + rsaKey.sessionKey +
                    chr(len(_id)) + _id +
                    chr(len(passwd)) + passwd).encode('utf-8')
@@ -88,7 +111,10 @@ class Auth(object):
                     with open(certificate, 'r') as f:
                         self.certificate = f.read()
 
-        self.auth = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Auth(isopen=False)
+        self.auth = Session(
+            self.server.LINE_HOST_DOMAIN,
+            self.server.Headers,
+            self.server.LINE_LOGIN_QUERY_PATH).Auth(isopen=False)
 
         lReq = self.__loginRequest('0', {
             'identityProvider': self.provider,
@@ -102,14 +128,19 @@ class Auth(object):
         })
 
         result = self.auth.loginZ(lReq)
-        
+
         if result.type == LoginResultType.REQUIRE_DEVICE_CONFIRM:
             self.callback.PinVerified(result.pinCode)
 
             self.server.setHeaders('X-Line-Access', result.verifier)
-            getAccessKey = self.server.getJson(self.server.parseUrl(self.server.LINE_CERTIFICATE_PATH), allowHeader=True)
+            getAccessKey = self.server.getJson(
+                self.server.parseUrl(self.server.LINE_CERTIFICATE_PATH),
+                allowHeader=True)
 
-            self.auth = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Auth(isopen=False)
+            self.auth = Session(
+                self.server.LINE_HOST_DOMAIN,
+                self.server.Headers,
+                self.server.LINE_LOGIN_QUERY_PATH).Auth(isopen=False)
 
             try:
                 lReq = self.__loginRequest('1', {
@@ -120,7 +151,7 @@ class Auth(object):
                 result = self.auth.loginZ(lReq)
             except:
                 raise Exception('Login failed')
-            
+
             if result.type == LoginResultType.SUCCESS:
                 if result.certificate is not None:
                     with open(_id + '.crt', 'w') as f:
@@ -141,23 +172,33 @@ class Auth(object):
             self.certificate = result.certificate
             self.loginWithAuthToken(result.authToken, appName)
 
-    def loginWithQrCode(self, keepLoggedIn=True, systemName=None, appName=None, showQr=False):
+    def loginWithQrCode(
+            self, keepLoggedIn=True, systemName=None,
+            appName=None, showQr=False):
         if systemName is None:
-            systemName=self.server.SYSTEM_NAME
+            systemName = self.server.SYSTEM_NAME
         if appName is None:
-            appName=self.server.APP_NAME
+            appName = self.server.APP_NAME
         self.server.setHeaders('X-Line-Application', appName)
 
-        self.tauth = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_AUTH_QUERY_PATH).Talk(isopen=False)
+        self.tauth = Session(
+            self.server.LINE_HOST_DOMAIN,
+            self.server.Headers,
+            self.server.LINE_AUTH_QUERY_PATH).Talk(isopen=False)
         qrCode = self.tauth.getAuthQrcode(keepLoggedIn, systemName)
 
         self.callback.QrUrl('line://au/q/' + qrCode.verifier, showQr)
         self.server.setHeaders('X-Line-Access', qrCode.verifier)
 
-        getAccessKey = self.server.getJson(self.server.parseUrl(self.server.LINE_CERTIFICATE_PATH), allowHeader=True)
-        
-        self.auth = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LOGIN_QUERY_PATH).Auth(isopen=False)
-        
+        getAccessKey = self.server.getJson(
+            self.server.parseUrl(self.server.LINE_CERTIFICATE_PATH),
+            allowHeader=True)
+
+        self.auth = Session(
+            self.server.LINE_HOST_DOMAIN,
+            self.server.Headers,
+            self.server.LINE_LOGIN_QUERY_PATH).Auth(isopen=False)
+
         try:
             lReq = self.__loginRequest('1', {
                 'keepLoggedIn': keepLoggedIn,
@@ -183,7 +224,7 @@ class Auth(object):
         if authToken is None:
             raise Exception('Please provide Auth Token')
         if appName is None:
-            appName=self.server.APP_NAME
+            appName = self.server.APP_NAME
         self.server.setHeadersWithDict({
             'X-Line-Application': appName,
             'X-Line-Access': authToken

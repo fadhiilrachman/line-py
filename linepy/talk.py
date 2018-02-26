@@ -2,15 +2,19 @@
 from akad.ttypes import Message
 from random import randint
 
-import json, ntpath
+import json
+import ntpath
+
 
 def loggedIn(func):
     def checkLogin(*args, **kwargs):
         if args[0].isLogin:
             return func(*args, **kwargs)
         else:
-            args[0].callback.other('You want to call the function, you must login to LINE')
+            args[0].callback.other(
+                'You want to call the function, you must login to LINE')
     return checkLogin
+
 
 class Talk(object):
     isLogin = False
@@ -72,7 +76,7 @@ class Talk(object):
             self._messageReq[to] = -1
         self._messageReq[to] += 1
         return self.talk.sendMessage(self._messageReq[to], msg)
-    
+
     """ Usage:
         @to Integer
         @text String
@@ -81,33 +85,34 @@ class Talk(object):
     @loggedIn
     def sendMessageWithMention(self, to, text='', dataMid=[]):
         arr = []
-        list_text=''
+        list_text = ''
         if '[list]' in text.lower():
-            i=0
+            i = 0
             for l in dataMid:
-                list_text+='\n@[list-'+str(i)+']'
-                i=i+1
-            text=text.replace('[list]', list_text)
+                list_text += '\n@[list-' + str(i) + ']'
+                i = i + 1
+            text = text.replace('[list]', list_text)
         elif '[list-' in text.lower():
-            text=text
+            text = text
         else:
-            i=0
+            i = 0
             for l in dataMid:
-                list_text+=' @[list-'+str(i)+']'
-                i=i+1
-            text=text+list_text
-        i=0
+                list_text += ' @[list-' + str(i) + ']'
+                i = i + 1
+            text = text + list_text
+        i = 0
         for l in dataMid:
-            mid=l
-            name='@[list-'+str(i)+']'
-            ln_text=text.replace('\n',' ')
+            mid = l
+            name = '@[list-' + str(i) + ']'
+            ln_text = text.replace('\n', ' ')
             if ln_text.find(name):
-                line_s=int(ln_text.index(name))
-                line_e=(int(line_s)+int(len(name)))
-            arrData={'S': str(line_s), 'E': str(line_e), 'M': mid}
+                line_s = int(ln_text.index(name))
+                line_e = (int(line_s) + int(len(name)))
+            arrData = {'S': str(line_s), 'E': str(line_e), 'M': mid}
             arr.append(arrData)
-            i=i+1
-        contentMetadata={'MENTION':str('{"MENTIONEES":' + json.dumps(arr).replace(' ','') + '}')}
+            i = i + 1
+        contentMetadata = {'MENTION': str(
+            '{"MENTIONEES":' + json.dumps(arr).replace(' ', '') + '}')}
         return self.sendMessage(to, text, contentMetadata)
 
     @loggedIn
@@ -118,7 +123,7 @@ class Talk(object):
             'STKID': stickerId
         }
         return self.sendMessage(to, '', contentMetadata, 7)
-        
+
     @loggedIn
     def sendContact(self, to, mid):
         contentMetadata = {'mid': mid}
@@ -126,7 +131,7 @@ class Talk(object):
 
     @loggedIn
     def sendGift(self, to, productId, productType):
-        if productType not in ['theme','sticker']:
+        if productType not in ['theme', 'sticker']:
             raise Exception('Invalid productType value')
         contentMetadata = {
             'MSGTPL': str(randint(0, 12)),
@@ -136,7 +141,8 @@ class Talk(object):
         return self.sendMessage(to, '', contentMetadata, 9)
 
     @loggedIn
-    def sendMessageAwaitCommit(self, to, text, contentMetadata={}, contentType=0):
+    def sendMessageAwaitCommit(self, to, text,
+                               contentMetadata={}, contentType=0):
         msg = Message()
         msg.to, msg._from = to, self.profile.mid
         msg.text = text
@@ -156,13 +162,16 @@ class Talk(object):
         return self.talk.requestResendMessage(0, senderMid, messageId)
 
     @loggedIn
-    def respondResendMessage(self, receiverMid, originalMessageId, resendMessage, errorCode):
-        return self.talk.respondResendMessage(0, receiverMid, originalMessageId, resendMessage, errorCode)
+    def respondResendMessage(self, receiverMid, originalMessageId,
+                             resendMessage, errorCode):
+        return self.talk.respondResendMessage(0, receiverMid,
+                                              originalMessageId,
+                                              resendMessage, errorCode)
 
     @loggedIn
     def removeMessage(self, messageId):
         return self.talk.removeMessage(messageId)
-    
+
     @loggedIn
     def removeAllMessages(self, lastMessageId):
         return self.talk.removeAllMessages(0, lastMessageId)
@@ -174,7 +183,7 @@ class Talk(object):
     @loggedIn
     def destroyMessage(self, chatId, messageId):
         return self.talk.destroyMessage(0, chatId, messageId, sessionId)
-    
+
     @loggedIn
     def sendChatChecked(self, consumer, messageId):
         return self.talk.sendChatChecked(0, consumer, messageId)
@@ -188,15 +197,19 @@ class Talk(object):
         return self.talk.getLastReadMessageIds(0, chatId)
 
     @loggedIn
-    def getPreviousMessagesV2WithReadCount(self, messageBoxId, endMessageId, messagesCount=50):
-        return self.talk.getPreviousMessagesV2WithReadCount(messageBoxId, endMessageId, messagesCount)
+    def getPreviousMessagesV2WithReadCount(self, messageBoxId,
+                                           endMessageId, messagesCount=50):
+        return self.talk.getPreviousMessagesV2WithReadCount(messageBoxId,
+                                                            endMessageId,
+                                                            messagesCount)
 
     """Object"""
 
     @loggedIn
     def sendImage(self, to, path):
-        objectId = self.sendMessage(to=to, text=None, contentType = 1).id
-        return self.uploadObjTalk(path=path, type='image', returnAs='bool', objId=objectId)
+        objectId = self.sendMessage(to=to, text=None, contentType=1).id
+        return self.uploadObjTalk(path=path, type='image',
+                                  returnAs='bool', objId=objectId)
 
     @loggedIn
     def sendImageWithURL(self, to, url):
@@ -205,7 +218,8 @@ class Talk(object):
 
     @loggedIn
     def sendGIF(self, to, path):
-        return self.uploadObjTalk(path=path, type='gif', returnAs='bool', to=to)
+        return self.uploadObjTalk(path=path, type='gif',
+                                  returnAs='bool', to=to)
 
     @loggedIn
     def sendGIFWithURL(self, to, url):
@@ -214,8 +228,13 @@ class Talk(object):
 
     @loggedIn
     def sendVideo(self, to, path):
-        objectId = self.sendMessage(to=to, text=None, contentMetadata={'VIDLEN': '60000','DURATION': '60000'}, contentType = 2).id
-        return self.uploadObjTalk(path=path, type='video', returnAs='bool', objId=objectId)
+        objectId = self.sendMessage(
+            to=to,
+            text=None,
+            contentMetadata={'VIDLEN': '60000', 'DURATION': '60000'},
+            contentType=2).id
+        return self.uploadObjTalk(path=path, type='video',
+                                  returnAs='bool', objId=objectId)
 
     @loggedIn
     def sendVideoWithURL(self, to, url):
@@ -224,8 +243,9 @@ class Talk(object):
 
     @loggedIn
     def sendAudio(self, to, path):
-        objectId = self.sendMessage(to=to, text=None, contentType = 3).id
-        return self.uploadObjTalk(path=path, type='audio', returnAs='bool', objId=objectId)
+        objectId = self.sendMessage(to=to, text=None, contentType=3).id
+        return self.uploadObjTalk(path=path, type='audio',
+                                  returnAs='bool', objId=objectId)
 
     @loggedIn
     def sendAudioWithURL(self, to, url):
@@ -237,8 +257,15 @@ class Talk(object):
         if file_name == '':
             file_name = ntpath.basename(path)
         file_size = len(open(path, 'rb').read())
-        objectId = self.sendMessage(to=to, text=None, contentMetadata={'FILE_NAME': str(file_name),'FILE_SIZE': str(file_size)}, contentType = 14).id
-        return self.uploadObjTalk(path=path, type='file', returnAs='bool', objId=objectId)
+        objectId = self.sendMessage(
+            to=to,
+            text=None,
+            contentMetadata={
+                'FILE_NAME': str(file_name),
+                'FILE_SIZE': str(file_size)},
+            contentType=14).id
+        return self.uploadObjTalk(path=path, type='file',
+                                  returnAs='bool', objId=objectId)
 
     @loggedIn
     def sendFileWithURL(self, to, url, fileName=''):
@@ -246,7 +273,7 @@ class Talk(object):
         return self.sendFile(to, path, fileName)
 
     """Contact"""
-        
+
     @loggedIn
     def blockContact(self, mid):
         return self.talk.blockContact(0, mid)
@@ -305,7 +332,8 @@ class Talk(object):
 
     @loggedIn
     def tryFriendRequest(self, midOrEMid, friendRequestParams, method=1):
-        return self.talk.tryFriendRequest(midOrEMid, method, friendRequestParams)
+        return self.talk.tryFriendRequest(midOrEMid, method,
+                                          friendRequestParams)
 
     @loggedIn
     def makeUserAddMyselfAsContact(self, contactOwnerMid):
@@ -318,7 +346,7 @@ class Talk(object):
     @loggedIn
     def reissueUserTicket(self, expirationTime=100, maxUseCount=100):
         return self.talk.reissueUserTicket(expirationTime, maxUseCount)
-    
+
     @loggedIn
     def cloneContactProfile(self, mid):
         contact = self.getContact(mid)
@@ -343,16 +371,18 @@ class Talk(object):
 
     @loggedIn
     def createChatRoomAnnouncement(self, chatRoomMid, type, contents):
-        return self.talk.createChatRoomAnnouncement(0, chatRoomMid, type, contents)
+        return self.talk.createChatRoomAnnouncement(0, chatRoomMid, type,
+                                                    contents)
 
     @loggedIn
     def removeChatRoomAnnouncement(self, chatRoomMid, announcementSeq):
-        return self.talk.removeChatRoomAnnouncement(0, chatRoomMid, announcementSeq)
+        return self.talk.removeChatRoomAnnouncement(0, chatRoomMid,
+                                                    announcementSeq)
 
     @loggedIn
     def getGroupWithoutMembers(self, groupId):
         return self.talk.getGroupWithoutMembers(groupId)
-    
+
     @loggedIn
     def findGroupByTicket(self, ticketId):
         return self.talk.findGroupByTicket(ticketId)
@@ -412,7 +442,8 @@ class Talk(object):
 
     @loggedIn
     def updateGroupPreferenceAttribute(self, groupMid, updatedAttrs):
-        return self.talk.updateGroupPreferenceAttribute(0, groupMid, updatedAttrs)
+        return self.talk.updateGroupPreferenceAttribute(0, groupMid,
+                                                        updatedAttrs)
 
     @loggedIn
     def inviteIntoGroup(self, groupId, midlist):
@@ -457,17 +488,20 @@ class Talk(object):
         return self.talk.leaveRoom(0, roomId)
 
     """Call"""
-        
+
     @loggedIn
     def acquireCallTalkRoute(self, to):
         return self.talk.acquireCallRoute(to)
-    
+
     """Report"""
 
     @loggedIn
-    def reportSpam(self, chatMid, memberMids=[], spammerReasons=[], senderMids=[], spamMessageIds=[], spamMessages=[]):
-        return self.talk.reportSpam(chatMid, memberMids, spammerReasons, senderMids, spamMessageIds, spamMessages)
-        
+    def reportSpam(self, chatMid, memberMids=[], spammerReasons=[],
+                   senderMids=[], spamMessageIds=[], spamMessages=[]):
+        return self.talk.reportSpam(chatMid, memberMids, spammerReasons,
+                                    senderMids, spamMessageIds, spamMessages)
+
     @loggedIn
     def reportSpammer(self, spammerMid, spammerReasons=[], spamMessageIds=[]):
-        return self.talk.reportSpammer(spammerMid, spammerReasons, spamMessageIds)
+        return self.talk.reportSpammer(spammerMid, spammerReasons,
+                                       spamMessageIds)

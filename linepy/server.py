@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 from .config import Config
-import json, requests, urllib
+import json
+import requests
+import urllib
+
 
 class Server(Config):
-    _session        = requests.session()
+    _session = requests.session()
     timelineHeaders = {}
-    Headers         = {}
+    Headers = {}
 
     def __init__(self):
         self.Headers = {}
@@ -22,7 +25,8 @@ class Server(Config):
         if allowHeader is False:
             return json.loads(self._session.get(url).text)
         else:
-            return json.loads(self._session.get(url, headers=self.Headers).text)
+            return json.loads(
+                self._session.get(url, headers=self.Headers).text)
 
     def setHeadersWithDict(self, headersDict):
         self.Headers.update(headersDict)
@@ -37,32 +41,32 @@ class Server(Config):
         self.timelineHeaders[argument] = value
 
     def additionalHeaders(self, source, newSource):
-        headerList={}
+        headerList = {}
         headerList.update(source)
         headerList.update(newSource)
         return headerList
 
     def optionsContent(self, url, data=None, headers=None):
         if headers is None:
-            headers=self.Headers
+            headers = self.Headers
         return self._session.options(url, headers=headers, data=data)
 
     def postContent(self, url, data=None, files=None, headers=None):
         if headers is None:
-            headers=self.Headers
+            headers = self.Headers
         return self._session.post(url, headers=headers, data=data, files=files)
 
     def getContent(self, url, headers=None):
         if headers is None:
-            headers=self.Headers
+            headers = self.Headers
         return self._session.get(url, headers=headers, stream=True)
 
     def deleteContent(self, url, data=None, headers=None):
         if headers is None:
-            headers=self.Headers
+            headers = self.Headers
         return self._session.delete(url, headers=headers, data=data)
 
     def putContent(self, url, data=None, headers=None):
         if headers is None:
-            headers=self.Headers
+            headers = self.Headers
         return self._session.put(url, headers=headers, data=data)
