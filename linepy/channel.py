@@ -29,8 +29,8 @@ class Channel(object):
 
     def __loginChannel(self):
         self.isLogin = True
-        self.channelResult =
-        self.approveChannelAndIssueChannelToken(self.channelId)
+        self.channelResult = \
+            self.approveChannelAndIssueChannelToken(self.channelId)
         self.__createChannelSession()
 
     @loggedIn

@@ -240,7 +240,7 @@ class Timeline(Channel):
         params = {
             'homeId': mid,
             'commentLimit': commentLimit,
-            'likeLimit': likeLimit
+            'likeLimit': likeLimit,
             'sourceType': 'TALKROOM'}
         url = self.server.urlEncode(
             self.server.LINE_TIMELINE_API, '/v27/post/list.json', params)

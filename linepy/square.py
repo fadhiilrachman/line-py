@@ -25,8 +25,8 @@ class Square(object):
         try:
             self.isSupportSquare = True
             self.squares = self.getJoinedSquares().squares
-            self.squareObsToken =
-            self.acquireEncryptedAccessToken(2).split('\x1e')[1]
+            self.squareObsToken = \
+                self.acquireEncryptedAccessToken(2).split('\x1e')[1]
         except:
             self.isSupportSquare = False
             self.log('Your LINE account is not support Square')
@@ -116,8 +116,8 @@ class Square(object):
         if squareChatMid not in self._messageReq:
             self._messageReq[squareChatMid] = -1
         self._messageReq[squareChatMid] += 1
-        rq.squareMessage.squareMessageRevision =
-        self._messageReq[squareChatMid]
+        rq.squareMessage.squareMessageRevision = \
+            self._messageReq[squareChatMid]
         return self.square.sendMessage(rq)
 
     @loggedIn
@@ -377,15 +377,15 @@ class Square(object):
         rq.squareChatAnnouncement.announcementSeq = 0
         rq.squareChatAnnouncement.type = 0
         rq.squareChatAnnouncement.contents = SquareChatAnnouncementContents()
-        rq.squareChatAnnouncement.contents.textMessageAnnouncementContents =
-        TextMessageAnnouncementContents()
-        rq.squareChatAnnouncement.contents.
-        textMessageAnnouncementContents.messageId = messageId
-        rq.squareChatAnnouncement.contents.
-        textMessageAnnouncementContents.text = text
-        rq.squareChatAnnouncement.contents.
-        textMessageAnnouncementContents.senderSquareMemberMid =
-        senderSquareMemberMid
+        rq.squareChatAnnouncement.contents.textMessageAnnouncementContents = \
+            TextMessageAnnouncementContents()
+        rq.squareChatAnnouncement.contents. \
+            textMessageAnnouncementContents.messageId = messageId
+        rq.squareChatAnnouncement.contents. \
+            textMessageAnnouncementContents.text = text
+        rq.squareChatAnnouncement.contents. \
+            textMessageAnnouncementContents.senderSquareMemberMid = \
+            senderSquareMemberMid
         return self.square.createSquareChatAnnouncement(rq)
 
     @loggedIn

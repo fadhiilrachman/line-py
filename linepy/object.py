@@ -141,8 +141,8 @@ class Object(object):
             raise Exception('Invalid type value')
         headers = None
         files = {'file': open(path, 'rb')}
-        if type == 'image' or type == 'video' or
-        type == 'audio' or type == 'file':
+        if type == 'image' or type == 'video' \
+                or type == 'audio' or type == 'file':
             e_p = self.server.LINE_OBS_DOMAIN + '/talk/m/upload.nhn'
             data = {'params': self.genOBSParams({
                 'oid': objId,
