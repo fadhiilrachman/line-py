@@ -17,3 +17,7 @@ class Shop(object):
     @loggedIn
     def getProduct(self, packageID, language, country):
         return self.shop.getProduct(packageID, language, country)
+    
+    @loggedIn
+    def getActivePurchases(self, start, size, language, country):
+        return self.shop.getActivePurchases(start, size, language, country)
