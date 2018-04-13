@@ -1,6 +1,6 @@
 # ![logo](/examples/assets/LINE-sm.png) LINE Python
 
- [![Version 3.0.8](https://img.shields.io/badge/beta-3.0.8-brightgreen.svg "Version 3.0.8")](https://pypi.python.org/pypi/linepy) [![LICENSE](https://img.shields.io/badge/license-BSD%203%20Clause-blue.svg "LICENSE")](https://github.com/fadhiilrachman/line-py/blob/master/LICENSE) [![Supported python versions: 3.x](https://img.shields.io/badge/python-3.x-green.svg "Supported python versions: 3.x")](https://www.python.org/downloads/) [![Chat on Discord](https://img.shields.io/badge/chat-on%20discord-7289da.svg "Chat on Discord")](https://discord.gg/JAA2uk6)
+ [![Version 3.0.8](https://img.shields.io/badge/beta-3.0.8-brightgreen.svg "Version 3.0.8")](https://pypi.python.org/pypi/linepy) [![LICENSE](https://img.shields.io/badge/license-BSD%203%20Clause-blue.svg "LICENSE")](https://github.com/fadhiilrachman/line-py/blob/master/LICENSE) [![Supported python versions: 3.x](https://img.shields.io/badge/python-3.x-green.svg "Supported python versions: 3.x")](https://www.python.org/downloads/) [![Chat on Discord](https://discordapp.com/api/guilds/370888828489170956/widget.png "Chat on Discord")](https://discord.gg/JAA2uk6)
 
 *LINE Messaging's private API*
 
