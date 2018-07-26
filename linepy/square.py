@@ -10,7 +10,7 @@ def loggedIn(func):
             else:
                 args[0].callback.other('You want to call the function, you must login to LINE')
         else:
-            args[0].callback.other('Your LINE account is not support Square')
+            args[0].callback.other('Your LINE account doesn\'t support Square')
     return checkLogin
 
 class Square(object):
@@ -25,7 +25,7 @@ class Square(object):
             self.squareObsToken = self.acquireEncryptedAccessToken(2).split('\x1e')[1]
         except:
             self.isSupportSquare = False
-            self.log('Your LINE account is not support Square')
+            self.log('Your LINE account doesn\'t support Square')
 
     """Object"""
 
