@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 from linepy import *
 
-line = LINE('EMAIL', 'PASSWORD')
-#line = LINE('AUTHTOKEN')
-
-line.log("Auth Token : " + str(line.authToken))
-line.log("Timeline Token : " + str(line.tl.channelAccessToken))
+client = LINE('EMAIL', 'PASSWORD')
+#client = LINE('AUTHTOKEN')
+#client = LINE() Qr login
+client.log("Auth Token : " + str(client.authToken))
+client.log("Timeline Token : " + str(client.tl.channelAccessToken))
 
 # Initialize OEPoll with LINE instance
-oepoll = OEPoll(line)
+tracer = OEPoll(client)
 
 # Receive messages from OEPoll
 def RECEIVE_MESSAGE(op):
@@ -26,39 +26,44 @@ def RECEIVE_MESSAGE(op):
     receiver = msg.to
     sender = msg._from
     
+    #fix for pm case
+    if msg.toType == 0: #private message
+        msg.to = msg._from
+    
     try:
         # Check content only text message
         if msg.contentType == 0:
             # Check only group chat
             if msg.toType == 2:
                 # Chat checked request
-                line.sendChatChecked(receiver, msg_id)
+                client.sendChatChecked(receiver, msg_id)
                 # Get sender contact
-                contact = line.getContact(sender)
+                contact = client.getContact(sender)
                 # Command list
                 if text.lower() == 'hi':
-                    line.log('[%s] %s' % (contact.displayName, text))
-                    line.sendMessage(receiver, 'Hi too! How are you?')
+                    client.log('[%s] %s' % (contact.displayName, text))
+                    client.sendMessage(receiver, 'Hi too! How are you?')
                 elif text.lower() == '/author':
-                    line.log('[%s] %s' % (contact.displayName, text))
-                    line.sendMessage(receiver, 'My author is linepy')
+                    client.log('[%s] %s' % (contact.displayName, text))
+                    client.sendMessage(receiver, 'My author is linepy')
     except Exception as e:
-        line.log("[RECEIVE_MESSAGE] ERROR : " + str(e))
+        client.log("[RECEIVE_MESSAGE] ERROR : " + str(e))
     
 # Auto join if BOT invited to group
 def NOTIFIED_INVITE_INTO_GROUP(op):
     try:
         group_id=op.param1
+        #op.param2 is who invited, and op.param3 is who got invited (this might not be just you, it could  be string or list)
         # Accept group invitation
-        line.acceptGroupInvitation(group_id)
+        client.acceptGroupInvitation(group_id)
     except Exception as e:
-        line.log("[NOTIFIED_INVITE_INTO_GROUP] ERROR : " + str(e))
+        client.log("[NOTIFIED_INVITE_INTO_GROUP] ERROR : " + str(e))
 
 # Add function to OEPoll
-oepoll.addOpInterruptWithDict({
+tracer.addOpInterruptWithDict({
     OpType.RECEIVE_MESSAGE: RECEIVE_MESSAGE,
     OpType.NOTIFIED_INVITE_INTO_GROUP: NOTIFIED_INVITE_INTO_GROUP
 })
 
 while True:
-    oepoll.trace()
+    tracer.trace()
