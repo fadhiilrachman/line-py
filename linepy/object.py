@@ -178,12 +178,14 @@ class Object(object):
             return True
 
     @loggedIn
-    def downloadObjectMsg(self, messageId, returnAs='path', saveAs=''):
+    def downloadObjectMsg(self, messageId, returnAs='path', saveAs='', isGif=False):
         if saveAs == '':
             saveAs = self.genTempFile('path')
         if returnAs not in ['path','bool','bin']:
             raise Exception('Invalid returnAs value')
         params = {'oid': messageId}
+        if isGif:
+            params['tid'] = 'original'
         url = self.server.urlEncode(self.server.LINE_OBS_DOMAIN, '/talk/m/download.nhn', params)
         r = self.server.getContent(url)
         if r.status_code == 200:
