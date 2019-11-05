@@ -119,15 +119,15 @@ class Object(object):
             e_p = self.server.LINE_OBS_DOMAIN + '/talk/m/upload.nhn'
             data = {'params': self.genOBSParams({'oid': objId,'size': len(open(path, 'rb').read()),'type': type})}
         elif type == 'gif':
-            e_p = self.server.LINE_OBS_DOMAIN + '/talk/m/upload.nhn'
+            e_p = self.server.LINE_OBS_DOMAIN + '/r/talk/m/reqseq'
             files = None
             data = open(path, 'rb').read()
             params = {
                 'oid': 'reqseq',
                 'reqseq': '%s' % str(self.revision),
                 'tomid': '%s' % str(to),
-                'name': '%s' % str(time.time()*1000),
-                'cat': 'original',
+                'size': '%s' % str(len(data)),
+                'range': len(data),
                 'type': 'image'
             }
             headers = self.server.additionalHeaders(self.server.Headers, {
@@ -178,14 +178,12 @@ class Object(object):
             return True
 
     @loggedIn
-    def downloadObjectMsg(self, messageId, returnAs='path', saveAs='', isGif=False):
+    def downloadObjectMsg(self, messageId, returnAs='path', saveAs=''):
         if saveAs == '':
             saveAs = self.genTempFile('path')
         if returnAs not in ['path','bool','bin']:
             raise Exception('Invalid returnAs value')
         params = {'oid': messageId}
-        if isGif:
-            params['tid'] = 'original'
         url = self.server.urlEncode(self.server.LINE_OBS_DOMAIN, '/talk/m/download.nhn', params)
         r = self.server.getContent(url)
         if r.status_code == 200:
