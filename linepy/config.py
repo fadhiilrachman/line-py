@@ -20,7 +20,7 @@ class Config(object):
     LINE_SHOP_QUERY_PATH        = '/SHOP4'
 
     CHANNEL_ID = {
-        'LINE_TIMELINE': '1341209850',
+        'LINE_TIMELINE': '1341209950',
         'LINE_WEBTOON': '1401600689',
         'LINE_TODAY': '1518712866',
         'LINE_STORE': '1376922440',
@@ -28,7 +28,7 @@ class Config(object):
         'LINE_SERVICES': '1459630796'
     }
 
-    APP_TYPE    = ApplicationType._VALUES_TO_NAMES[96]
+    APP_TYPE    = ApplicationType._VALUES_TO_NAMES[304] # iPad
     APP_VER     = '7.18.1'
     CARRIER     = '51089, 1-0'
     SYSTEM_NAME = 'FDLRCN'
