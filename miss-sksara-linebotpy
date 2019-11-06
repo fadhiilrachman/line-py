@@ -1,0 +1,41 @@
+logo LINE Python
+
+Version 3.0.8 LICENSE Supported python versions: 3.x Chat on Discord
+
+LINE Messaging's private API
+
+Requirement
+
+The linepy module only requires Python 3. You can download from here.
+
+Installation
+
+Installation is simple. It can be installed from pip using the following command:
+
+$ pip install linepy
+
+Or from the code:
+
+$ python setup.py install
+
+Usage
+
+>>> from linepy import *
+
+>>> line = LINE('EMAIL', 'PASSWORD')
+
+>>> line.log("Auth Token : " + str(line.authToken))
+
+Examples
+
+All examples can be found here.
+
+Updates
+
+From pip using the following command:
+
+$ pip install linepy --upgrade
+
+Author
+
+Fadhiil Rachman / @fadhiilrachman
